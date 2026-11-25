@@ -65,6 +65,12 @@ header{background:var(--navy);color:#fff}
 .btn.wa{background:var(--coral);color:#fff}.btn.cl{background:rgba(255,255,255,.14);color:#fff}
 .btn[aria-disabled=true]{opacity:.55;pointer-events:none}
 footer{color:var(--soft);font-size:14px}
+.ask{margin-top:40px;background:var(--navy);color:#fff;border-radius:20px;padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:center}
+.ask h2{font-size:clamp(24px,3vw,30px)}.ask p{margin:6px 0 0;color:#C9DCE2;max-width:60ch}
+.ask a{min-height:48px;padding:12px 20px;border-radius:12px;background:var(--coral);color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.ask a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(max-width:600px){.ask{grid-template-columns:1fr}}
+
 @media(max-width:760px){.hero{grid-template-columns:1fr}.mosaic{grid-template-rows:repeat(2,minmax(0,120px))}.how{grid-template-columns:1fr}}
 </style>
 </head>
@@ -90,6 +96,10 @@ footer{color:var(--soft);font-size:14px}
 <main class="band" style="padding-top:6px">
   <div class="wrap">
     <div id="list"></div>
+    <div class="ask">
+      <div><h2>Não encontrou o que procura?</h2><p>A gente faz sob medida: mande uma foto, um desenho ou só a ideia, com o tamanho e o tema, que respondemos com uma prévia e o orçamento.</p></div>
+      <a href="https://wa.me/5573988062663?text=Ol%C3%A1%2C%20G-Code%21%20N%C3%A3o%20encontrei%20no%20cat%C3%A1logo%20o%20que%20procuro.%20Queria%20fazer%3A%20" target="_blank" rel="noopener">Fale com a gente no WhatsApp</a>
+    </div>
     <div class="how">
       <div><b>1. Escolha</b><span>Marque as peças e a quantidade. Pode ser só uma ideia: a gente adapta tamanho, nome e cores.</span></div>
       <div><b>2. Mande no WhatsApp</b><span>O botão monta a mensagem com a sua lista. É só enviar.</span></div>
