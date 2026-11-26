@@ -155,7 +155,7 @@ export default function Finalizar({ produtos }: { produtos: P[] }) {
         <label className={`${rotulo} sm:col-span-2`}>Observações<textarea name="observacoes" rows={3} maxLength={2000} placeholder="Prazo desejado, ponto de referência…" className={`${campo} py-2`} /></label>
         <label className="sm:col-span-2 flex items-start gap-2 text-sm">
           <input type="checkbox" name="lgpd" required className="mt-0.5 size-5 accent-[var(--teal)]" />
-          <span>Concordo que a G-Code guarde meu nome e contato para produzir e entregar este pedido. Posso pedir a exclusão a qualquer momento pelo WhatsApp.</span>
+          <span>Concordo que a G-Code guarde meus dados para produzir e entregar este pedido, conforme as <a href="/politicas#privacidade" target="_blank" className="underline">políticas da loja</a>. Posso pedir a exclusão a qualquer momento pelo WhatsApp.</span>
         </label>
       </section>
 

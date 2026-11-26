@@ -219,7 +219,8 @@ export default function Vitrine({
             <a href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener" style={{ color: "inherit" }}>
               @gcodecaravelas
             </a>
-            . As fotos marcadas como &quot;prévia&quot; são o projeto da peça; as &quot;foto real&quot; já foram feitas.
+            . As fotos marcadas como &quot;prévia&quot; são o projeto da peça; as &quot;foto real&quot; já foram feitas.{" "}
+            <a href="/politicas" style={{ color: "inherit", textDecoration: "underline" }}>Trocas, entrega e privacidade</a>.
           </footer>
         </div>
       </main>

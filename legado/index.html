@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G-Code · peças a laser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: vitrine de ateliê, direta e simpática; o cliente escolhe e chama no WhatsApp
+   IDEA: a bancada do laser: cada peça é uma etiqueta presa no quadro, que o cliente marca
+   PICTURE: faixa azul-marinho com o logo e um mosaico das peças reais; cada cartão com a foto da peça
+   COLOUR and TYPE: marinho #0E3A4F, verde-água #1F9AA0, coral #F2694B, creme #FBF8F3; Space Grotesk, a fonte da marca
+   LAYOUT: topo com logo e mosaico, categorias numa fileira que rola, grade de cartões, barra fixa com o pedido */
+:root{color-scheme:light dark;
+--bg:light-dark(#FBF8F3,#0B1E28);--card:light-dark(#FFFFFF,#12303F);--ink:light-dark(#0E3A4F,#EAF2F4);--soft:light-dark(#5B6B73,#A9BCC4);
+--navy:#0E3A4F;--teal:light-dark(#167C81,#3FC0C6);--coral:light-dark(#D9502F,#F2694B);--line:light-dark(#E6DED2,#1E4558);--pic:light-dark(#F2ECE2,#183A4B);--sel:light-dark(#E6F4F4,#163F4D)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Space Grotesk',system-ui,sans-serif;overflow-x:clip;padding-bottom:130px}
+h1,h2,h3{margin:0;line-height:1.08;text-wrap:balance;font-weight:700}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1200px;margin:0 auto}
+header{background:var(--navy);color:#fff}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(20px,4vw,48px);align-items:center}
+.logo{height:56px;width:auto;display:block;margin-bottom:22px}
+.hero h1{font-size:clamp(32px,4.6vw,50px)}
+.hero p{font-size:17px;color:#C9DCE2;max-width:56ch;margin:14px 0 0}
+.chips0{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chips0 span{border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font-size:14px;color:#E3EEF1}
+.mosaic{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,170px));gap:10px}
+.mosaic img{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block;background:#fff}
+.mosaic img:first-child{grid-row:span 2}
+.cats{position:sticky;top:0;z-index:4;background:var(--bg);border-bottom:1px solid var(--line)}
+.catbar{position:relative;display:flex;align-items:center;padding:0 max(5vw,16px);--in:max(calc(5vw - 20px),0px)}
+.scroll{display:flex;gap:8px;overflow-x:auto;padding:12px 4px;scrollbar-width:none;scroll-behavior:smooth;flex:1;min-width:0;position:relative}
+.scroll::-webkit-scrollbar{display:none}
+.arr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:600 26px/1 'Space Grotesk',sans-serif;cursor:pointer;box-shadow:0 2px 10px rgba(14,58,79,.15);display:grid;place-items:center;padding:0 0 3px}
+.arr[hidden]{display:none}.arr.l{left:var(--in)}.arr.r{right:var(--in)}
+.arr:hover{background:var(--teal);color:#fff;border-color:var(--teal)}.arr:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.catbar::before,.catbar::after{content:'';position:absolute;top:0;bottom:0;width:56px;pointer-events:none;z-index:1;opacity:0;transition:opacity .2s}
+.catbar::before{left:var(--in);background:linear-gradient(90deg,var(--bg) 40%,transparent)}.catbar::after{right:var(--in);background:linear-gradient(270deg,var(--bg) 40%,transparent)}
+.catbar.fl::before,.catbar.fr::after{opacity:1}
+.cat{flex:none;min-height:44px;padding:8px 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:500 15px 'Space Grotesk',sans-serif;cursor:pointer}
+.cat[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
+.cat:focus-visible,.btn:focus-visible,.add:focus-visible,.step button:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.sec{margin:34px 0 12px;scroll-margin-top:80px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec h2{font-size:28px}.sec p{margin:0;color:var(--soft);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--card);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;border:2px solid transparent}
+.card.on{border-color:var(--teal)}
+.pic{position:relative;height:200px;background:var(--pic);display:flex;align-items:center;justify-content:center;padding:10px}
+.pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.tag{position:absolute;left:10px;top:10px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--navy);color:#fff}
+.tag.p{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.body h3{font-size:19px}
+.body p{margin:0;color:var(--soft);font-size:14.5px}
+.foot{margin-top:auto;padding-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.add{min-height:44px;padding:8px 14px;border-radius:12px;border:0;background:var(--coral);color:#fff;font:700 15px 'Space Grotesk',sans-serif;cursor:pointer}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--sel);color:var(--ink);font:700 20px 'Space Grotesk',sans-serif;cursor:pointer}
+.step b{min-width:2ch;text-align:center;font-size:18px}
+.onlbl{font-size:14px;font-weight:700;color:var(--teal)}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:40px}
+.how div{background:var(--card);border-radius:16px;padding:16px}
+.how b{display:block;font-size:17px;margin-bottom:4px}.how span{color:var(--soft);font-size:14.5px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--navy);color:#fff;padding:12px max(5vw,16px);z-index:5}
+.bar .in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.bar .t{flex:1;display:flex;flex-direction:column}
+.bar small{font-size:13px;color:#C9DCE2}.bar strong{font-size:clamp(18px,2.6vw,22px)}
+.btn{min-height:44px;padding:10px 16px;border-radius:12px;border:0;font:700 15px 'Space Grotesk',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn.wa{background:var(--coral);color:#fff}.btn.cl{background:rgba(255,255,255,.14);color:#fff}
+.btn[aria-disabled=true]{opacity:.55;pointer-events:none}
+footer{color:var(--soft);font-size:14px}
+.ask{margin-top:40px;background:var(--navy);color:#fff;border-radius:20px;padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:center}
+.ask h2{font-size:clamp(24px,3vw,30px)}.ask p{margin:6px 0 0;color:#C9DCE2;max-width:60ch}
+.ask a{min-height:48px;padding:12px 20px;border-radius:12px;background:var(--coral);color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.ask a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.ask .bt{display:flex;flex-wrap:wrap;gap:10px}.ask a.ig{background:transparent;border:1.5px solid rgba(255,255,255,.55)}
+@media(max-width:600px){.ask{grid-template-columns:1fr}}
+
+@media(max-width:760px){.hero{grid-template-columns:1fr}.mosaic{grid-template-rows:repeat(2,minmax(0,120px))}.how{grid-template-columns:1fr}}
+.mk{display:inline-flex;align-items:center;min-height:44px;font-weight:700;color:var(--teal);text-decoration:none}.mk:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap hero">
+    <div>
+      <img class="logo" src="img/logo.svg" alt="G-Code">
+      <h1>Peças cortadas e gravadas a laser, feitas sob encomenda</h1>
+      <p>Organizadores, decoração, chaveiros, kits de festa e placas para o seu negócio. Escolha o que gostou aqui embaixo e mande o pedido pelo WhatsApp: a gente responde com o orçamento e o prazo.</p>
+      <div class="chips0"><span>MDF cru ou pintado</span><span>Nome e tema do seu jeito</span><span>Do chaveiro ao painel de 80 cm</span></div>
+    </div>
+    <div class="mosaic">
+      <img src="img/orat.jpg" alt="Oratório de Nossa Senhora da Conceição">
+      <img src="img/porta.jpg" alt="Organizador porta-celular">
+      <img src="img/chav.jpg" alt="Chaveiros de jubarte">
+      <img src="img/copos.jpg" alt="Porta-copos de cortiça">
+      <img src="img/leao.jpg" alt="Leãozinho de festa">
+    </div>
+  </div>
+</header>
+<nav class="cats" aria-label="Categorias"><div class="catbar wrap"><button class="arr l" type="button" id="cprev" aria-label="Ver categorias anteriores" hidden>&#8249;</button><div class="scroll" id="cats"></div><button class="arr r" type="button" id="cnext" aria-label="Ver mais categorias" hidden>&#8250;</button></div></nav>
+<main class="band" style="padding-top:6px">
+  <div class="wrap">
+    <div id="list"></div>
+    <div class="ask">
+      <div><h2>Não encontrou o que procura?</h2><p>A gente faz sob medida: mande uma foto, um desenho ou só a ideia, com o tamanho e o tema, que respondemos com uma prévia e o orçamento.</p></div>
+      <div class="bt"><a href="https://wa.me/5573988062663?text=Ol%C3%A1%2C%20G-Code%21%20N%C3%A3o%20encontrei%20no%20cat%C3%A1logo%20o%20que%20procuro.%20Queria%20fazer%3A%20" target="_blank" rel="noopener">Fale com a gente no WhatsApp</a><a class="ig" href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener">Ver no Instagram @gcodecaravelas</a></div>
+    </div>
+    <div class="how">
+      <div><b>1. Escolha</b><span>Marque as peças e a quantidade. Pode ser só uma ideia: a gente adapta tamanho, nome e cores.</span></div>
+      <div><b>2. Mande no WhatsApp</b><span>O botão monta a mensagem com a sua lista. É só enviar.</span></div>
+      <div><b>3. Orçamento e prazo</b><span>Respondemos com o valor, uma prévia da arte e quando fica pronto.</span></div>
+    </div>
+    <footer style="margin-top:28px">G-Code · Laser · Gráfica · Assistência — WhatsApp (73) 98806-2663 · Instagram <a href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener" style="color:inherit">@gcodecaravelas</a>. As fotos marcadas como "prévia" são o projeto da peça; as "foto real" já foram feitas.</footer>
+  </div>
+</main>
+<div class="bar" role="region" aria-label="Seu pedido">
+  <div class="in">
+    <div class="t"><small>Seu pedido</small><strong id="sum">Nenhuma peça ainda</strong></div>
+    <button class="btn cl" id="clr" type="button">Limpar</button>
+    <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener" aria-disabled="true">Pedir orçamento no WhatsApp</a>
+  </div>
+</div>
+<script>
+{
+const CATS=[['org','Organização'],['dec','Decoração'],['rel','Relógios'],['mus','Música'],['fe','Fé'],['chav','Chaveiros e lembranças'],['festa','Festas'],['neg','Para o seu negócio'],['arte','Criação de arte'],['coz','Cozinha'],['ades','Adesivos e rótulos'],['hol','Holístico e símbolos']];
+const P=[
+ {id:'porta',c:'org',n:'Organizador porta-celular',d:'Celular, chaves, carteira e relógio num lugar só, em MDF.',img:'porta',real:1},
+ {id:'suporte',c:'org',n:'Suporte de mesa com ganchos',d:'Peça de encaixe para pendurar e organizar na bancada.',img:'suporte',real:1},
+ {id:'lapis',c:'org',n:'Porta-lápis com divisórias',d:'Para mesa de escritório ou estudo.',img:'lapis'},
+ {id:'a4',c:'org',n:'Organizador de papéis A4',d:'Prateleiras para folhas e pastas.',img:'a4'},
+ {id:'nicho',c:'org',n:'Nichos modulares',d:'Cubos de encaixe para montar do seu jeito na parede ou na mesa.',img:'nicho'},
+ {id:'barquinho',c:'org',n:'Porta-controles barquinho',d:'Barco de 27 cm com 3 compartimentos para controles remotos, celular e óculos. A vela divide o meio.',img:'barquinho'},
+ {id:'portaret',c:'dec',n:'Porta-retrato redondo',d:'Ø 15 cm com base de encaixe e fundo com travas para trocar a foto. Gravação personalizada no aro.',img:'portaret'},
+ {id:'veleiro',c:'dec',n:'Veleiro de mesa',d:'Enfeite de 17 cm para mesa ou prateleira, com base de ondas gravadas.',img:'veleiro'},
+ {id:'vaz',c:'dec',n:'Palavras vazadas',d:'Cantinho do Café, Bar, Lavanderia, Gratidão ou a palavra que você quiser.',img:'vaz'},
+ {id:'luz',c:'dec',n:'Quadro luminoso jubarte',d:'Quadro em camadas com luz por trás.',img:'luz'},
+ {id:'cauda',c:'dec',n:'Cauda de baleia decorativa',d:'Peça de mesa com a cauda da jubarte rendada.',img:'cauda'},
+ {id:'natal',c:'dec',n:'Porta-retrato de Natal 10×15',d:'Cru gravado ou pintado à mão, com o ano.',img:'natal'},
+ {id:'copos',c:'mus',n:'Porta-copos de cortiça retrô',d:'Coleção de 9 desenhos: vinil, fita K7, toca-discos, boombox e mais.',img:'copos'},
+ {id:'orat',c:'fe',n:'Oratório Nossa Senhora da Conceição',d:'Em camadas, com base. Também com outros santos.',img:'orat',real:1},
+ {id:'cristo',c:'fe',n:'Chaveiros de fé',d:'Jesus, cruz, pomba, salmo 23 e outros.',img:'cristo'},
+ {id:'orixas',c:'fe',n:'Chaveiros dos orixás',d:'Oxóssi, Iemanjá, Ogum, Oxum, Iansã, Oxalá e outros.',img:'orixas'},
+ {id:'zen',c:'fe',n:'Chaveiros zen',d:'Buda, yin-yang, lótus, mandala e outros símbolos.',img:'zen'},
+ {id:'esp',c:'chav',n:'Chaveiros do mar',d:'Jubarte, farol, tartaruga, peixes e aves.',img:'esp'},
+ {id:'chav',c:'chav',n:'Chaveiros de jubarte',d:'Com nome ou frase, em MDF ou acrílico.',img:'chav',real:1},
+ {id:'chav1',c:'chav',n:'Chaveiros personalizados',d:'Para lembrancinha, empresa ou evento, em quantidade.',img:'chav1',real:1},
+ {id:'inox',c:'chav',n:'Chaveiro metálico gravado',d:'Placa metálica pintada com arte gravada a laser.',img:'inox'},
+ {id:'kit',c:'festa',n:'Kit de festa pegue e monte',d:'Personagem de chão, painel arco e bandejas no tema escolhido. Desmonta para guardar.',img:'leao'},
+ {id:'topo',c:'festa',n:'Topo de bolo',d:'Com o número, o nome e o tema da festa.',img:'topo'},
+ {id:'toppers',c:'festa',n:'Toppers de docinho',d:'Kits de 30 no tema da festa.',img:'toppers'},
+ {id:'band',c:'festa',n:'Bandeirola com nome',d:'Bandeirinhas coloridas com as letras em relevo.',img:'bandeirola'},
+ {id:'lembr',c:'festa',n:'Lembrancinhas',d:'Chaveiro ou ímã com o nome e a data, gravado dos dois lados.',img:'lembr'},
+ {id:'radikit',c:'hol',n:'Kit de radiestesia',d:'Caixa gravada com 6 gráficos (sim/não, porcentagem, alfabeto, chakras, decágono, espiral) e suporte do pêndulo.',img:'radi_kit'},
+ {id:'radigraf',c:'hol',n:'Gráficos de radiestesia avulsos',d:'15 × 20 cm em MDF gravado, cru ou preto. Também em tamanho grande para consultório.',img:'radi_graf'},
+ {id:'flor',c:'hol',n:'Mandala flor da vida',d:'Disco de 30 cm com a flor da vida gravada, para parede ou altar.',img:'flor'},
+ {id:'arvore',c:'hol',n:'Árvore da vida vazada',d:'Peça de parede de 30 cm, recortada inteira no MDF.',img:'arvore'},
+ {id:'chakras',c:'hol',n:'Placa dos 7 chakras',d:'11 × 33 cm, com os símbolos gravados e pintados nas cores de cada chakra.',img:'chakras'},
+ {id:'hamsa',c:'hol',n:'Mão de Fátima (hamsa)',d:'20 cm, recortada com o olho e os detalhes gravados. Pintada ou crua.',img:'hamsa'},
+ {id:'memento',c:'hol',n:'Memento mori',d:'Medalhão de 9 cm com caveira e ampulhetas, para mesa ou parede. Também como chaveiro.',img:'memento'},
+ {id:'filtro',c:'hol',n:'Filtro dos sonhos',d:'25 cm em MDF recortado, com teia e penas. Para quarto de criança ou adulto.',img:'filtro'},
+ {id:'lua',c:'hol',n:'Fases da lua',d:'Faixa de parede de 34 cm com as 7 fases, em peça única.',img:'lua'},
+ {id:'olho',c:'hol',n:'Olho grego',d:'5 cm, pintado nas cores tradicionais, como ímã ou chaveiro.',img:'olho'},
+ {id:'lotus',c:'hol',n:'Flor de lótus',d:'30 cm, recortada com as pétalas gravadas. Pintada em rosa ou crua.',img:'lotus'},
+ {id:'coztri',c:'coz',n:'Descanso de panela de cortiça',d:'Ø 20 cm, 10 mm de cortiça (2 camadas coladas), gravado com folhas e "bom apetite". Personaliza com o nome da casa.',img:'coz_tri'},
+ {id:'cozhex',c:'coz',n:'Descansos hexagonais (jogo de 3)',d:'Hexágonos de 12 cm em cortiça com favos gravados. Juntos viram um descanso grande.',img:'coz_hex'},
+ {id:'cozja',c:'coz',n:'Jogo americano de cortiça',d:'Oval 40 × 30 cm com borda de folhinhas gravada. Vende em jogo de 4 ou 6.',img:'coz_ja'},
+ {id:'adrot',c:'ades',n:'Rótulos para potes',d:'Temperos, mantimentos, potes de banheiro ou de produtos que você vende. Vinil à prova d\'água, no tamanho do seu pote.',img:'ad_rot'},
+ {id:'relnome',c:'rel',n:'Relógio com nome',d:'Ø 22 cm em MDF, com o nome da família ou da empresa gravado. Máquina silenciosa sob encomenda.',img:'rel_nome'},
+ {id:'relmand',c:'rel',n:'Relógio mandala vazada',d:'Ø 24 cm, recorte vazado, pintado na cor que você escolher.',img:'rel_mandala'},
+ {id:'relondas',c:'rel',n:'Relógio ondas do mar',d:'Ø 22 cm com ondas em camadas pintadas, sol e gaivotas gravados.',img:'rel_ondas'},
+ {id:'relgel',c:'rel',n:'Relógio tampinha "Hora da gelada"',d:'Ø 22 cm em formato de tampinha, para bar, área gourmet e churrasqueira.',img:'rel_gelada'},
+ {id:'musonda',c:'mus',n:'Quadro de onda sonora',d:'Eternize um som: música, coração do bebê no ultrassom, latido do pet ou a voz de quem você ama. 30 × 14 cm com base.',img:'mus_onda',link:'onda.html',lk:'Crie o seu agora →'},
+ {id:'musvinil',c:'mus',n:'Relógio disco de vinil',d:'Ø 24 cm com selo central personalizado: nome da família, do casal ou da banda.',img:'mus_vinil'},
+ {id:'kitm1',c:'arte',n:'Kit Marca Básico',d:'Logo (criação ou vetorização) com os arquivos + 100 cartões de visita + folha de adesivos redondos + display QR em acrílico. A partir de R$ 249.',img:'kit_marca'},
+ {id:'kitm2',c:'arte',n:'Kit Marca Completo',d:'Identidade simples + 100 cartões + 2 folhas de adesivos + display QR + placa de balcão gravada + 10 chaveiros + 50 tags para embalagem. A partir de R$ 549.',img:'kit_marca'},
+ {id:'artvet',c:'arte',n:'Vetorização de logo',d:'Sua logo de foto ou print para vetor limpo (SVG, PDF e PNG). Grátis na compra de qualquer peça; só o arquivo, a partir de R$ 20.',img:'arte_vet'},
+ {id:'artaj',c:'arte',n:'Ajuste de arte',d:'Troca de texto, cor e tamanho, versão em uma cor e arquivo pronto para o laser. A partir de R$ 15.',img:'arte_aj'},
+ {id:'artlogo',c:'arte',n:'Criação de logo',d:'Logo do zero, com 2 rodadas de ajuste. Como o selo que fizemos para o Buteco Praia do Porto. A partir de R$ 80.',img:'arte_logo'},
+ {id:'artid',c:'arte',n:'Identidade simples',d:'Logo com versões colorida, uma cor e negativa, cores e fonte da marca, num guia de uma página. A partir de R$ 200.',img:'arte_id'},
+ {id:'adred',c:'ades',n:'Adesivos redondos para embalagem',d:'Com a sua marca, para fechar sacolas, caixas e potes. A partir de uma folha.',img:'ad_red'},
+ {id:'adesc',c:'ades',n:'Etiquetas escolares',d:'Com nome, série e desenho, para material e lancheira. Vinil resistente.',img:'ad_esc'},
+ {id:'adpix',c:'ades',n:'Adesivo Pix e Instagram',d:'Folha A4 com os dois adesivos coloridos no tamanho das placas de balcão, com o seu QR conferido.',img:'ad_pix'},
+ {id:'qr',c:'neg',n:'Display de QR Code',d:'Instagram e WhatsApp em acrílico preto com base, para o balcão.',img:'qr'},
+ {id:'placa',c:'neg',n:'Placa Pix 6×8 cm',d:'Acrílico preto com o seu logo, o QR e o símbolo Pix.',img:'placa'}
+];
+const q={};let cat='all';
+try{Object.assign(q,JSON.parse(localStorage.getItem('gcode-pedido')||'{}'))}catch(e){}
+function chips(){const el=document.getElementById('cats'),x=el.scrollLeft;el.innerHTML=[['all','Tudo'],...CATS].map(([k,l])=>`<button class="cat" type="button" data-cat="${k}" aria-pressed="${cat===k}">${l}</button>`).join('');el.style.scrollBehavior='auto';el.scrollLeft=x;el.style.scrollBehavior='';const a=el.querySelector('[aria-pressed=true]');if(a){const r=a.offsetLeft+a.offsetWidth-el.clientWidth+48,lft=a.offsetLeft-48;if(el.scrollLeft<r)el.scrollLeft=r;else if(el.scrollLeft>lft)el.scrollLeft=lft}arrows()}
+function arrows(){const el=document.getElementById('cats'),bar=el.parentNode,m=el.scrollWidth-el.clientWidth,L=el.scrollLeft>4,R=el.scrollLeft<m-4;document.getElementById('cprev').hidden=!L;document.getElementById('cnext').hidden=!R;bar.classList.toggle('fl',L);bar.classList.toggle('fr',R)}
+document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('cats');el.addEventListener('scroll',arrows,{passive:true});addEventListener('resize',arrows);
+document.getElementById('cprev').onclick=()=>el.scrollBy({left:-el.clientWidth*0.7});document.getElementById('cnext').onclick=()=>el.scrollBy({left:el.clientWidth*0.7});arrows()});
+function card(p){
+  const n=q[p.id]||0;
+  const ctl=n?`<span class="onlbl">No pedido</span><div class="step"><button type="button" data-m="${p.id}" aria-label="Menos ${p.n}">−</button><b>${n}</b><button type="button" data-p="${p.id}" aria-label="Mais ${p.n}">+</button></div>`:`<span></span><button class="add" type="button" data-p="${p.id}">Quero este</button>`;
+  return `<article class="card${n?' on':''}"><div class="pic"><span class="tag${p.real?'':' p'}">${p.real?'foto real':'prévia'}</span><img src="img/${p.img}.jpg" alt="${p.n}" loading="lazy"></div><div class="body"><h3>${p.n}</h3><p>${p.d}</p>${p.link?`<a class="mk" href="${p.link}">${p.lk}</a>`:''}<div class="foot">${ctl}</div></div></article>`;
+}
+function list(){
+  const cs=cat==='all'?CATS:CATS.filter(c=>c[0]===cat);
+  document.getElementById('list').innerHTML=cs.map(([k,l])=>`<section><div class="sec"><h2>${l}</h2></div><div class="grid">${P.filter(p=>p.c===k).map(card).join('')}</div></section>`).join('');
+}
+function bar(){
+  const it=P.filter(p=>q[p.id]);const tot=it.reduce((a,p)=>a+q[p.id],0);
+  document.getElementById('sum').textContent=it.length?`${it.length} ${it.length>1?'peças':'peça'} · ${tot} ${tot>1?'unidades':'unidade'}`:'Nenhuma peça ainda';
+  const wa=document.getElementById('wa');
+  if(it.length){const t='Olá, G-Code! Vi o catálogo e quero orçamento de:\n'+it.map(p=>`• ${q[p.id]}× ${p.n}`).join('\n')+'\n\nNome/tema/cores: ';
+    wa.href='https://wa.me/5573988062663?text='+encodeURIComponent(t);wa.setAttribute('aria-disabled','false')}
+  else{wa.href='#';wa.setAttribute('aria-disabled','true')}
+  try{localStorage.setItem('gcode-pedido',JSON.stringify(q))}catch(e){}
+}
+function all(){chips();list();bar()}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-cat]');if(c){cat=c.dataset.cat;chips();list();return}
+  const p=e.target.closest('[data-p]'),m=e.target.closest('[data-m]');
+  if(!p&&!m)return;
+  const id=(p||m).dataset.p||(p||m).dataset.m;
+  q[id]=Math.max(0,(q[id]||0)+(p?1:-1));if(!q[id])delete q[id];
+  const y=window.scrollY;list();bar();window.scrollTo(0,y);
+});
+document.getElementById('clr').addEventListener('click',()=>{for(const k in q)delete q[k];list();bar()});
+all();
+}
+</script>
+</body>
+</html>
