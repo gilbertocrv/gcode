@@ -61,6 +61,8 @@ details{margin-top:26px;background:var(--card);border:1px solid var(--line);bord
 summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monospace;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:8px}
 .adm{padding:4px 0 16px;display:flex;flex-direction:column;gap:10px}
+label.chk{flex-direction:row;align-items:flex-start;gap:10px;font-size:15px;color:var(--ink);cursor:pointer}label.chk input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:#167C81}
+input[type=url]{font:15px 'Space Grotesk',sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px;width:100%}
 </style>
 </head>
 <body>
@@ -96,6 +98,11 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monosp
       <h2>Escolha as cores</h2>
       <div class="sws" id="sws"></div>
     </div></div>
+    <div class="step"><span class="n">5</span><div>
+      <h2>QR Code para ouvir o som</h2>
+      <label class="chk"><input id="qr" type="checkbox"> <span>Quero uma plaquinha com QR Code atrás do quadro: apontando o celular, toca o áudio. <b>Sem custo.</b></span></label>
+      <div class="meta" id="qrTip" hidden style="margin-top:6px">Para o QR funcionar, a gente precisa guardar o seu áudio. Depois de mandar a mensagem, envie o arquivo do áudio na mesma conversa do WhatsApp. Quem tiver o QR consegue ouvir o áudio.</div>
+    </div></div>
   </div>
 
   <div class="prevbox">
@@ -117,6 +124,7 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monosp
     <div class="adm">
       <div class="meta">Cole a mensagem do cliente (ou só o código GC1…) para recriar a onda. Ou escolha o áudio acima. Depois baixe o SVG: vermelho = corte, preto = gravação, azul = guia de colagem.</div>
       <textarea id="paste" placeholder="Cole aqui a mensagem do WhatsApp"></textarea>
+      <label>Link do áudio no Drive (só se o cliente quiser o QR; deixe vazio se não)<input id="qrurl" type="url" placeholder="https://drive.google.com/file/d/…"></label>
       <div class="row"><button class="btn sec" id="load" type="button">Usar esta mensagem</button><button class="btn" id="dl" type="button">Baixar SVG para o laser</button></div>
       <div class="msg" id="dmsg" role="status"></div>
     </div>
@@ -125,6 +133,7 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monosp
 </main>
 
 <script src="lib/opentype.min.js"></script>
+<script src="lib/qrcode.js"></script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -193,7 +202,7 @@ function preview(){
   if(sample){$('wa').setAttribute('aria-disabled','true');$('code').hidden=true;$('waTip').textContent='A onda acima é só um exemplo. Escolha o seu áudio para gerar a sua.';return}
   const code=encode(amps);$('code').hidden=false;$('code').textContent='Código da onda: '+code;
   const s=+$('start').value,d=Math.min(+$('dur').value,buf?buf.duration-s:+$('dur').value);
-  const msg=`Olá, G-Code! Quero o Quadro de onda sonora (30 × 14 cm).\nTexto: ${t1}\nLinha de baixo: ${t2}\nCores: ${col.n}\n`+(fileName?`Trecho: ${mmss(s)} a ${mmss(s+d)} de "${fileName}"\n`:'')+`Código da onda: ${code}`;
+  const msg=`Olá, G-Code! Quero o Quadro de onda sonora (30 × 14 cm).\nTexto: ${t1}\nLinha de baixo: ${t2}\nCores: ${col.n}\n`+($('qr').checked?'QR Code no verso: sim (vou enviar o arquivo do áudio aqui na conversa)\n':'')+(fileName?`Trecho: ${mmss(s)} a ${mmss(s+d)} de "${fileName}"\n`:'')+`Código da onda: ${code}`;
   $('wa').href='https://wa.me/5573988062663?text='+encodeURIComponent(msg);$('wa').setAttribute('aria-disabled','false');
   $('waTip').textContent='A mensagem já vai com o texto, as cores e o código da onda. Mandamos a prévia final antes de produzir.';
 }
@@ -250,6 +259,7 @@ $('play').addEventListener('click',async()=>{if(!buf)return;if(src){stop();retur
   src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);const s=+$('start').value,d=Math.min(+$('dur').value,buf.duration-s);
   src.onended=()=>{src=null;$('play').textContent='▶ Ouvir o trecho'};src.start(0,s,d);$('play').textContent='■ Parar'});
 ['t1','t2'].forEach(k=>$(k).addEventListener('input',preview));
+$('qr').addEventListener('change',()=>{$('qrTip').hidden=!$('qr').checked;preview()});
 
 // ---------- área G-Code ----------
 function dmsg(t,bad){$('dmsg').textContent=t;$('dmsg').classList.toggle('bad',!!bad)}
@@ -258,16 +268,22 @@ $('load').addEventListener('click',()=>{const s=$('paste').value,a=decode(s);if(
   const t1=/Texto:\s*(.+)/.exec(s),t2=/Linha de baixo:\s*(.+)/.exec(s),c=/Cores:\s*(.+)/.exec(s);
   if(t1)$('t1').value=t1[1].trim();if(t2)$('t2').value=t2[1].trim();
   if(c){const k=COLORS.find(x=>x.n===c[1].trim());if(k){col=k;[...$('sws').children].forEach((x,i)=>x.setAttribute('aria-pressed',COLORS[i]===k))}}
-  drawOverview();preview();dmsg('Onda recriada. Confira a prévia e baixe o SVG.')});
+  drawOverview();preview();dmsg('Onda recriada. Confira a prévia e baixe o SVG.'+(/QR Code no verso:\s*sim/i.test(s)?' O cliente quer o QR: salve o áudio no Drive, copie o link compartilhado e cole no campo acima antes de baixar.':''))});
 $('dl').addEventListener('click',async()=>{
   dmsg('Gerando o arquivo…');let txt='',warn='';const t1=$('t1').value.trim(),t2=$('t2').value.trim();
   try{const F=await loadFonts();
     txt=`<path d="${textPath(F.t,t1,8.5,0,30,0,250)}"/><path d="${textPath(F.s,t2,3.4,0,46,1,250)}"/>`}
   catch(e){warn=' Não consegui carregar as fontes: os textos vieram como texto comum. No LightBurn, converta em curvas (Ctrl+Shift+C) antes de gravar.';
     txt=`<text x="0" y="34" text-anchor="middle" font-family="Dancing Script" font-size="15">${esc(t1)}</text><text x="0" y="47.6" text-anchor="middle" font-family="Space Grotesk" font-size="4.8" letter-spacing="1">${esc(t2)}</text>`}
+  const qurl=$('qrurl').value.trim();let qrG='',H=256;
+  if(qurl){if(!window.qrcode){dmsg('Não consegui carregar o gerador de QR.',true);return}
+    const q=qrcode(0,'M');q.addData(qurl);q.make();const n=q.getModuleCount(),S=31,m=S/n,ox=4.5,oy=3;let r='';
+    for(let y=0;y<n;y++){let x=0;while(x<n){if(q.isDark(y,x)){let x2=x;while(x2<n&&q.isDark(y,x2))x2++;r+=`<rect x="${f(ox+x*m)}" y="${f(oy+y*m)}" width="${f((x2-x)*m+.02)}" height="${f(m+.02)}"/>`;x=x2}else x++}}
+    qrG=`<g transform="translate(5 258)"><path d="${rr(0,0,40,40,3)}" ${'fill="none" stroke="#FF0000" stroke-width="0.1"'}/><g fill="#000000">${r}</g><text x="20" y="38" text-anchor="middle" font-family="Space Grotesk" font-size="2.6" fill="#000000">aponte a câmera e ouça</text></g>`;H=302;
+    try{const F=await loadFonts();qrG=qrG.replace(/<text[^>]*>aponte a câmera e ouça<\/text>/,`<path fill="#000000" d="${textPath(F.s,'aponte a câmera e ouça',1.9,20,37,0.3,34)}"/>`)}catch(e){}}
   const CUT='fill="none" stroke="#FF0000" stroke-width="0.1"',REF='fill="none" stroke="#0000FF" stroke-width="0.1"';
   const svg=`<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="310mm" height="256mm" viewBox="0 0 310 256">
+<svg xmlns="http://www.w3.org/2000/svg" width="310mm" height="${H}mm" viewBox="0 0 310 ${H}">
 <!-- G-Code · Quadro onda sonora 30x14 · vermelho=corte (MDF 3 mm placa e onda; MDF 6 mm base) · preto=gravação · azul=guia (saída desligada) -->
 <!-- ${encode(amps)} -->
 <g transform="translate(155 75)">
@@ -277,10 +293,11 @@ $('dl').addEventListener('click',async()=>{
 </g>
 <g transform="translate(155 ${5+146+5+30+14})"><path d="${wave(amps,-14)}" ${CUT}/></g>
 <g transform="translate(40 219)"><path d="${baseD()}" ${CUT}/></g>
+${qrG}
 </svg>`;
   const name='Onda - '+(t1||'quadro').replace(/[\\/:*?"<>|]/g,'')+'.svg';
   const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
-  dmsg('Arquivo "'+name+'" baixado. Placa e onda em MDF 3 mm; a base (embaixo) em MDF 6 mm.'+warn,!!warn);
+  dmsg('Arquivo "'+name+'" baixado. Placa e onda em MDF 3 mm; a base em MDF 6 mm.'+(qurl?' A plaquinha do QR (4×4 cm, MDF 3 mm) está no canto de baixo: teste o QR no celular antes de colar.':'')+warn,!!warn);
 });
 drawOverview();preview();
 })();
