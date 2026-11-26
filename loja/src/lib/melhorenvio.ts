@@ -3,7 +3,7 @@ import "server-only";
 /** Melhor Envio: cotação e etiqueta. Sem MELHORENVIO_TOKEN, o site oferece só retirada e "combinar frete". */
 const BASE = process.env.MELHORENVIO_SANDBOX === "1" ? "https://sandbox.melhorenvio.com.br" : "https://melhorenvio.com.br";
 export const meConfigurado = () => !!process.env.MELHORENVIO_TOKEN;
-export const cepOrigem = () => (process.env.MELHORENVIO_CEP_ORIGEM ?? "45900000").replace(/\D/g, "");
+export const cepOrigem = () => (process.env.MELHORENVIO_CEP_ORIGEM ?? "45900000").replace(/\D/g, "").slice(0, 8);
 
 async function me<T>(path: string, body?: unknown, method = body ? "POST" : "GET"): Promise<T> {
   const r = await fetch(BASE + path, {
