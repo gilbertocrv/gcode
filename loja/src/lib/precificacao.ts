@@ -9,6 +9,7 @@ export type CustoProduto = {
   material_custo: number | null; material_largura: number | null; material_altura: number | null;
   largura_cm: number | null; altura_cm: number | null; camadas: number | null; extras: number | null;
   tempo_maquina_min: number | null; tempo_mao_obra_min: number | null;
+  caixa_custo?: number | null;
 };
 
 export const numCfg = (c: Record<string, unknown>) =>
@@ -30,7 +31,7 @@ export function custoPeca(c: Config, p: CustoProduto) {
   const m2 = p.material_custo && p.material_largura && p.material_altura
     ? n(p.material_custo) / ((n(p.material_largura) * n(p.material_altura)) / 10000) : 0;
   const material = m2 * (n(p.largura_cm) * n(p.altura_cm)) / 10000 * Math.max(1, n(p.camadas)) * (1 + c.perda);
-  return material + n(p.extras) + (n(p.tempo_maquina_min) / 60) * d.maquinaHora
+  return material + n(p.extras) + n(p.caixa_custo) + (n(p.tempo_maquina_min) / 60) * d.maquinaHora
     + (n(p.tempo_mao_obra_min) / 60) * d.valorHora + d.dasPeca;
 }
 

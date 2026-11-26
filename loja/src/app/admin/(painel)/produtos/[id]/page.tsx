@@ -11,13 +11,14 @@ export default async function EditarProduto({ params, searchParams }: { params: 
   const { id } = await params;
   const { novo } = await searchParams;
   const sb = await requireAdmin();
-  const [{ data: p }, { data: custos }, { data: fotos }, { data: categorias }, { count: vendas }, { data: materiais }] = await Promise.all([
+  const [{ data: p }, { data: custos }, { data: fotos }, { data: categorias }, { count: vendas }, { data: materiais }, { data: caixas }] = await Promise.all([
     sb.from("produtos").select("*").eq("id", id).maybeSingle(),
     sb.from("produto_custos").select("*").eq("produto_id", id).maybeSingle(),
     sb.from("produto_imagens").select("id, url, storage_path, ordem").eq("produto_id", id).order("ordem"),
     sb.from("categorias").select("slug, nome").order("ordem"),
     sb.from("itens_pedido").select("id", { count: "exact", head: true }).eq("produto_id", id),
-    sb.from("materiais").select("id, nome").not("largura_cm", "is", null).order("nome"),
+    sb.from("materiais").select("id, nome").not("largura_cm", "is", null).neq("material", "Caixas de envio").order("nome"),
+    sb.from("materiais").select("id, nome").eq("material", "Caixas de envio").order("nome"),
   ]);
   if (!p) notFound();
 
@@ -33,7 +34,7 @@ export default async function EditarProduto({ params, searchParams }: { params: 
         <FotosProduto produtoId={p.id} slug={p.slug} fotos={fotos ?? []} />
       </section>
 
-      <FormProduto acao={salvarProduto} p={p} custos={custos ?? {}} categorias={categorias ?? []} materiais={materiais ?? []} />
+      <FormProduto acao={salvarProduto} p={p} custos={custos ?? {}} categorias={categorias ?? []} materiais={materiais ?? []} caixas={caixas ?? []} />
 
       <section className={`${cartao} mt-8`}>
         <h2 className="text-lg mb-1">Excluir produto</h2>

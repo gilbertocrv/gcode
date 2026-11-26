@@ -42,6 +42,13 @@ export async function salvarProduto(form: FormData) {
     caixa_alt_cm: num(form, "caixa_alt_cm"),
   };
 
+  const caixaId = txt(form, "caixa_id");
+  Object.assign(dados, { caixa_id: caixaId });
+  if (caixaId) {
+    const { data: cx } = await sb.from("materiais").select("largura_cm, altura_cm, profundidade_cm").eq("id", caixaId).single();
+    if (cx) Object.assign(dados, { caixa_comp_cm: Number(cx.largura_cm) + 1, caixa_larg_cm: Number(cx.altura_cm) + 1, caixa_alt_cm: Number(cx.profundidade_cm ?? 5) + 1 });
+  }
+
   let produtoId = id;
   if (id) {
     const { error } = await sb.from("produtos").update(dados).eq("id", id);

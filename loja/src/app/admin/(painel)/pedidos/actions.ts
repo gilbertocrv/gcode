@@ -107,6 +107,7 @@ export async function salvarPedido(form: FormData) {
       codigo_rastreio: txt(form, "codigo_rastreio"),
       ml_order_id: txt(form, "ml_order_id"),
       notas_internas: txt(form, "notas_internas"),
+      ...(form.has("caixa_usada_id") ? { caixa_usada_id: txt(form, "caixa_usada_id") } : {}),
     })
     .eq("id", id);
   if (error) throw new Error(error.message);

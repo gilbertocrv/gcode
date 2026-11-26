@@ -11,11 +11,12 @@ type Item = { id: string; descricao: string; quantidade: number; preco_unitario:
 export default async function Pedido({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sb = await requireAdmin();
-  const [{ data: p }, { data: itens }, { data: hist }, { data: produtos }] = await Promise.all([
+  const [{ data: p }, { data: itens }, { data: hist }, { data: produtos }, { data: caixas }] = await Promise.all([
     sb.from("pedidos").select("*, clientes(id, nome, whatsapp, email, cidade, uf)").eq("id", id).maybeSingle(),
     sb.from("itens_pedido").select("id, descricao, quantidade, preco_unitario, subtotal, personalizacao, produto_id").eq("pedido_id", id).order("id"),
     sb.from("pedido_historico").select("id, status_de, status_para, nota, created_at").eq("pedido_id", id).order("created_at"),
     sb.from("produtos").select("id, titulo, preco, preco_a_partir_de").neq("status", "inativo").order("titulo"),
+    sb.from("materiais").select("id, nome, quantidade").eq("material", "Caixas de envio").order("nome"),
   ]);
   if (!p) notFound();
 
@@ -132,6 +133,15 @@ export default async function Pedido({ params }: { params: Promise<{ id: string 
             <label className={rotulo}>Prazo de entrega<input name="prazo_entrega" type="date" defaultValue={p.prazo_entrega ?? ""} className={campo} /></label>
             <label className={rotulo}>Código de rastreio<input name="codigo_rastreio" defaultValue={p.codigo_rastreio ?? ""} className={campo} /></label>
             <label className={rotulo}>Nº venda Mercado Livre<input name="ml_order_id" defaultValue={p.ml_order_id ?? ""} className={campo} /></label>
+            {p.entrega !== "retirada" && (
+              <label className={`${rotulo} md:col-span-3`}>
+                Caixa usada {p.embalagem_baixada ? "(já baixada do estoque)" : "(em branco: a maior caixa entre os itens)"}
+                <select name="caixa_usada_id" defaultValue={p.caixa_usada_id ?? ""} className={campo} disabled={p.embalagem_baixada}>
+                  <option value="">Automática</option>
+                  {caixas?.map((c) => <option key={c.id} value={c.id}>{c.nome} · {Number(c.quantidade)} em estoque</option>)}
+                </select>
+              </label>
+            )}
             <label className={`${rotulo} md:col-span-3`}>Notas internas (só você vê)<textarea name="notas_internas" rows={3} defaultValue={p.notas_internas ?? ""} className={`${campo} py-2`} /></label>
             <div className="md:col-span-3 flex flex-wrap items-center gap-4">
               <button className={btn} type="submit">Salvar</button>
@@ -153,6 +163,21 @@ export default async function Pedido({ params }: { params: Promise<{ id: string 
             ) : <p className="text-[var(--soft)]">Sem cliente.</p>}
             {p.observacoes && <p className="mt-3 text-sm whitespace-pre-wrap"><b>Pedido do cliente:</b> {p.observacoes}</p>}
           </section>
+
+          {p.entrega !== "retirada" && (p.status === "em_producao" || p.status === "enviado") && (
+            <section className={cartao}>
+              <h2 className="text-lg mb-2">Roteiro de envio</h2>
+              <ol className="list-decimal pl-5 text-sm flex flex-col gap-1">
+                <li>Confira a peça e a personalização com o pedido.</li>
+                <li>Embrulhe no plástico bolha (acrílico e peças vazadas com 2 voltas).</li>
+                <li>Coloque na caixa com o cartão de agradecimento; preencha os vazios para não balançar.</li>
+                <li>Feche com fita marrom e lacre com o adesivo da logo.</li>
+                <li>{p.entrega === "envio" ? "Gere e imprima a etiqueta abaixo e cole no lado maior." : "Combine a entrega com o cliente."}</li>
+                <li>Poste{p.frete_servico ? ` (${p.frete_servico})` : ""} e marque o pedido como “Enviado” — a caixa sai do estoque.</li>
+                <li>Busque o rastreio e mande pelo botão do WhatsApp.</li>
+              </ol>
+            </section>
+          )}
 
           <section className={cartao}>
             <h2 className="text-lg mb-2">Entrega</h2>
