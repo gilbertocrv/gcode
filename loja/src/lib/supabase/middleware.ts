@@ -26,8 +26,9 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminArea = pathname.startsWith("/admin");
   const isLogin = pathname === "/admin/login";
+  const isPublica = isLogin || pathname === "/admin/esqueci";
 
-  if (isAdminArea && !isLogin && !user) {
+  if (isAdminArea && !isPublica && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.searchParams.set("volta", pathname);

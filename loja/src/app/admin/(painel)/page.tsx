@@ -21,7 +21,8 @@ function Kpi({ rotulo, valor, destaque }: { rotulo: string; valor: string; desta
   );
 }
 
-export default async function Resumo() {
+export default async function Resumo({ searchParams }: { searchParams: Promise<{ senha?: string }> }) {
+  const { senha } = await searchParams;
   const { supabase } = await getAdmin();
   const [{ data: dash }, { data: pedidos }, { data: baixo }] = await Promise.all([
     supabase.from("vw_dashboard").select("*").single<Dashboard>(),
@@ -37,6 +38,7 @@ export default async function Resumo() {
   const d = dash ?? ({} as Partial<Dashboard>);
   return (
     <div className="flex flex-col gap-8">
+      {senha === "ok" && <p role="status" className="rounded-xl p-3 text-sm" style={{ background: "var(--sel)" }}>Senha trocada com sucesso.</p>}
       <section>
         <h1 className="text-3xl mb-4">Resumo</h1>
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">

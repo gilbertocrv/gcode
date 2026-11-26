@@ -1,9 +1,10 @@
+import Link from "next/link";
 import LoginForm from "./LoginForm";
 
 export const metadata = { title: "Entrar · Painel G-Code", robots: { index: false } };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ volta?: string }> }) {
-  const { volta } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ volta?: string; erro?: string }> }) {
+  const { volta, erro } = await searchParams;
   return (
     <main className="min-h-dvh grid place-items-center p-6" style={{ background: "var(--navy)" }}>
       <div className="w-full max-w-sm rounded-2xl p-7" style={{ background: "var(--card)", color: "var(--ink)" }}>
@@ -13,7 +14,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <p className="text-sm mb-6" style={{ color: "var(--soft)" }}>
           Acesso restrito. Entre com o e-mail e a senha de administrador.
         </p>
+        {erro === "link" && <p role="alert" className="mb-4 text-sm font-semibold" style={{ color: "var(--coral)" }}>O link expirou ou já foi usado. Peça outro em “Esqueci a senha”.</p>}
         <LoginForm volta={volta ?? "/admin"} />
+        <Link href="/admin/esqueci" className="mt-5 inline-block text-sm underline" style={{ color: "var(--soft)" }}>Esqueci a senha</Link>
       </div>
     </main>
   );
