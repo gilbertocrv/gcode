@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
     const opcoes = await cotar(cep, await itensDoPedido(createPublicClient(), itens));
     return NextResponse.json({ disponivel: true, opcoes });
   } catch (e) {
+    if (String((e as Error).message).includes("cep_destino")) {
+      return NextResponse.json({ disponivel: true, opcoes: [], erro: "CEP não encontrado. Confira os números." }, { status: 400 });
+    }
     console.error(e);
     return NextResponse.json({ disponivel: true, opcoes: [], erro: "Não foi possível calcular o frete agora." }, { status: 502 });
   }
