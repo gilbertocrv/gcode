@@ -64,6 +64,11 @@ export default function FormProduto({
         <label className={rotulo}>Em estoque<input name="estoque" type="number" min={0} defaultValue={p.estoque ?? 0} className={campo} /></label>
         <label className={rotulo}>Avisar quando chegar a<input name="estoque_minimo" type="number" min={0} defaultValue={p.estoque_minimo ?? 0} className={campo} /></label>
         <div className="md:col-span-3"><Check name="controla_estoque" label="Controlar estoque (baixa sozinho quando o pedido é concluído)" on={p.controla_estoque} /></div>
+        <h3 className="md:col-span-3 font-semibold mt-2">Embalagem para o frete</h3>
+        <label className={rotulo}>Peso embalado (g)<input name="peso_g" type="number" min={1} defaultValue={p.peso_g ?? ""} className={campo} /></label>
+        <label className={rotulo}>Caixa: comprimento (cm)<input name="caixa_comp_cm" inputMode="decimal" defaultValue={p.caixa_comp_cm ?? ""} className={campo} /></label>
+        <label className={rotulo}>Caixa: largura (cm)<input name="caixa_larg_cm" inputMode="decimal" defaultValue={p.caixa_larg_cm ?? ""} className={campo} /></label>
+        <label className={rotulo}>Caixa: altura (cm)<input name="caixa_alt_cm" inputMode="decimal" defaultValue={p.caixa_alt_cm ?? ""} className={campo} /></label>
       </section>
 
       <section className={`${cartao} grid gap-3 md:grid-cols-2`}>

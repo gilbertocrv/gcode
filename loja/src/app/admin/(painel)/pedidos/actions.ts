@@ -131,3 +131,36 @@ export async function mudarStatus(form: FormData) {
   revalidatePath("/admin");
   revalidatePath("/"); // estoque pode ter mudado
 }
+
+export async function gerarEtiquetaPedido(form: FormData) {
+  const { gerarEtiqueta, meConfigurado } = await import("@/lib/melhorenvio");
+  const { itensDoPedido } = await import("@/lib/frete-itens");
+  const sb = await requireAdmin();
+  if (!meConfigurado()) throw new Error("Melhor Envio não configurado (MELHORENVIO_TOKEN).");
+  const id = txt(form, "pedido_id")!;
+  const { data: p } = await sb.from("pedidos").select("numero, subtotal, entrega, frete_servico_id, endereco, me_order_id, clientes(nome, whatsapp, email)").eq("id", id).single();
+  if (!p || p.entrega !== "envio" || !p.frete_servico_id || !p.endereco) throw new Error("Pedido sem envio escolhido ou sem endereço.");
+  if (p.me_order_id) throw new Error("A etiqueta deste pedido já foi gerada.");
+  const { data: itens } = await sb.from("itens_pedido").select("produto_id, quantidade, preco_unitario").eq("pedido_id", id);
+  const c = (Array.isArray(p.clientes) ? p.clientes[0] : p.clientes) as { nome: string; whatsapp: string | null; email: string | null } | null;
+  const e = p.endereco as Record<string, string>;
+  const r = await gerarEtiqueta({
+    servicoId: p.frete_servico_id, numeroPedido: p.numero, valor: Number(p.subtotal ?? 0),
+    itens: await itensDoPedido(sb, (itens ?? []).map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade, preco: i.preco_unitario }))),
+    destino: { nome: c?.nome ?? "Cliente", telefone: c?.whatsapp, email: c?.email, documento: e.documento, rua: e.rua, numero: e.numero, complemento: e.complemento, bairro: e.bairro, cidade: e.cidade, uf: e.uf, cep: e.cep },
+  });
+  const { error } = await sb.from("pedidos").update({ me_order_id: r.id, etiqueta_url: r.url }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath(caminho(id));
+}
+
+export async function atualizarRastreio(form: FormData) {
+  const { rastreio } = await import("@/lib/melhorenvio");
+  const sb = await requireAdmin();
+  const id = txt(form, "pedido_id")!;
+  const { data: p } = await sb.from("pedidos").select("me_order_id").eq("id", id).single();
+  if (!p?.me_order_id) return;
+  const r = await rastreio(p.me_order_id);
+  if (r.codigo) await sb.from("pedidos").update({ codigo_rastreio: r.codigo }).eq("id", id);
+  revalidatePath(caminho(id));
+}

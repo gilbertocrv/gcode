@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/admin";
 import { formatBRL } from "@/lib/format";
 import { PAGAMENTOS, PROXIMO, nomeOrigem, nomeStatus, type StatusPedido } from "@/lib/pedidos";
 import { Status, Topo, btn, btn2, btnPerigo, campo, cartao, dataHoraBR, rotulo } from "@/components/admin/ui";
-import { adicionarItem, atualizarItem, mudarStatus, removerItem, salvarPedido } from "../actions";
+import { adicionarItem, atualizarItem, atualizarRastreio, gerarEtiquetaPedido, mudarStatus, removerItem, salvarPedido } from "../actions";
 
 type Item = { id: string; descricao: string; quantidade: number; preco_unitario: number | null; subtotal: number | null; personalizacao: Record<string, unknown>; produto_id: string | null };
 
@@ -152,6 +152,30 @@ export default async function Pedido({ params }: { params: Promise<{ id: string 
               </>
             ) : <p className="text-[var(--soft)]">Sem cliente.</p>}
             {p.observacoes && <p className="mt-3 text-sm whitespace-pre-wrap"><b>Pedido do cliente:</b> {p.observacoes}</p>}
+          </section>
+
+          <section className={cartao}>
+            <h2 className="text-lg mb-2">Entrega</h2>
+            {p.entrega === "retirada" && <p>Retirada na loja.</p>}
+            {p.entrega === "combinar" && <p>Combinar entrega pelo WhatsApp (ajuste o frete em “Valores e entrega”).</p>}
+            {p.entrega === "envio" && <p><b>{p.frete_servico ?? "Envio"}</b>{p.frete_prazo_dias ? ` · até ${p.frete_prazo_dias} dias úteis` : ""} · {formatBRL(Number(p.frete ?? 0))}</p>}
+            {p.endereco && (() => { const e = p.endereco as Record<string, string>; return (
+              <p className="mt-2 text-sm whitespace-pre-line">{`${e.rua}, ${e.numero}${e.complemento ? " - " + e.complemento : ""}\n${e.bairro ? e.bairro + " · " : ""}${e.cidade}/${e.uf} · CEP ${e.cep}`}</p>
+            ); })()}
+            {p.entrega === "envio" && !p.me_order_id && (p.status === "em_producao" || p.status === "enviado") && (
+              <form action={gerarEtiquetaPedido} className="mt-3">
+                <input type="hidden" name="pedido_id" value={p.id} />
+                <button className={`${btn} w-full`} type="submit">Gerar etiqueta (Melhor Envio)</button>
+                <p className="mt-1 text-xs text-[var(--soft)]">Usa o saldo da sua carteira no Melhor Envio.</p>
+              </form>
+            )}
+            {p.etiqueta_url && <a href={p.etiqueta_url} target="_blank" rel="noopener" className={`${btn2} mt-3 w-full`}>Imprimir etiqueta</a>}
+            {p.me_order_id && (
+              <form action={atualizarRastreio} className="mt-2">
+                <input type="hidden" name="pedido_id" value={p.id} />
+                <button className="text-sm underline cursor-pointer" type="submit">Buscar código de rastreio</button>
+              </form>
+            )}
           </section>
 
           <section className={cartao}>

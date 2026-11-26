@@ -8,6 +8,7 @@ export const metadata = { title: "Seu pedido · G-Code", robots: { index: false 
 
 type Consulta = {
   numero: number; status: string; total: number | null; prazo_entrega: string | null;
+  subtotal?: number | null; frete?: number | null; entrega?: string; frete_servico?: string | null; frete_prazo_dias?: number | null;
   codigo_rastreio: string | null; criado_em: string; itens: { descricao: string; quantidade: number }[] | null;
 };
 
@@ -70,13 +71,16 @@ export default async function AcompanharPedido({ params, searchParams }: { param
             <ul className="mb-4 flex flex-col gap-1">
               {p.itens?.map((i, k) => <li key={k}>{i.quantidade}× {i.descricao}</li>)}
             </ul>
-            {p.total != null && <p className="text-xl font-bold mb-3">Total {formatBRL(Number(p.total))}</p>}
+            {p.entrega === "envio" && <p className="text-sm">Frete ({p.frete_servico}{p.frete_prazo_dias ? `, até ${p.frete_prazo_dias} dias úteis após a postagem` : ""}): {formatBRL(Number(p.frete ?? 0))}</p>}
+            {p.entrega === "retirada" && <p className="text-sm">Retirada na loja.</p>}
+            {p.entrega === "combinar" && <p className="text-sm">Entrega a combinar pelo WhatsApp.</p>}
+            {p.total != null && <p className="text-xl font-bold mb-3 mt-1">Total {formatBRL(Number(p.total))}</p>}
             {p.status === "aguardando_pagamento" && Number(p.total) > 0 && (
               <a href={`/pedido/${p.numero}/pagar?t=${t}`} className="btn wa mb-4 inline-flex">Pagar com Pix ou cartão</a>
             )}
             {p.prazo_entrega && <p>Previsão de entrega: <b>{new Date(p.prazo_entrega + "T12:00:00").toLocaleDateString("pt-BR")}</b></p>}
             {p.codigo_rastreio && (
-              <p className="mt-1">Rastreio: <a className="underline font-semibold" href={`https://rastreamento.correios.com.br/app/index.php?objeto=${encodeURIComponent(p.codigo_rastreio)}`} target="_blank" rel="noopener">{p.codigo_rastreio}</a></p>
+              <p className="mt-1">Rastreio: <a className="underline font-semibold" href={`https://www.melhorrastreio.com.br/rastreio/${encodeURIComponent(p.codigo_rastreio)}`} target="_blank" rel="noopener">{p.codigo_rastreio}</a></p>
             )}
             <a href={`https://wa.me/${wa}?text=${encodeURIComponent(`Olá! Sobre o meu pedido #${p.numero}…`)}`} className="btn wa mt-6 inline-flex">Dúvidas? Fale no WhatsApp</a>
           </div>

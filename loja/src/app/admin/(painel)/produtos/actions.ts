@@ -36,6 +36,10 @@ export async function salvarProduto(form: FormData) {
     ml_item_id: txt(form, "ml_item_id"),
     ml_url: txt(form, "ml_url"),
     ordem: int(form, "ordem") ?? 0,
+    peso_g: int(form, "peso_g"),
+    caixa_comp_cm: num(form, "caixa_comp_cm"),
+    caixa_larg_cm: num(form, "caixa_larg_cm"),
+    caixa_alt_cm: num(form, "caixa_alt_cm"),
   };
 
   let produtoId = id;
