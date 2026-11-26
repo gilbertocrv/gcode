@@ -235,8 +235,11 @@ export default function Vitrine({
           <button className="btn cl" type="button" onClick={() => setPedido({})}>
             Limpar
           </button>
-          <a className="btn wa" href={totalPecas ? waHref : "#"} target="_blank" rel="noopener" aria-disabled={!totalPecas}>
-            Pedir orçamento no WhatsApp
+          <a className="btn cl" href={totalPecas ? waHref : "#"} target="_blank" rel="noopener" aria-disabled={!totalPecas}>
+            WhatsApp
+          </a>
+          <a className="btn wa" href={totalPecas ? "/finalizar" : "#"} aria-disabled={!totalPecas}>
+            Finalizar pedido
           </a>
         </div>
       </div>

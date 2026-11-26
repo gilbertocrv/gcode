@@ -14,9 +14,10 @@ type Consulta = {
 const ETAPAS = ["orcamento", "aguardando_pagamento", "em_producao", "enviado", "concluido"];
 const UUID = /^[0-9a-f-]{36}$/i;
 
-export default async function AcompanharPedido({ params, searchParams }: { params: Promise<{ numero: string }>; searchParams: Promise<{ t?: string }> }) {
+export default async function AcompanharPedido({ params, searchParams }: { params: Promise<{ numero: string }>; searchParams: Promise<{ t?: string; novo?: string; erro?: string; collection_status?: string; status?: string }> }) {
   const { numero } = await params;
-  const { t } = await searchParams;
+  const { t, novo, erro, collection_status, status: mpStatus } = await searchParams;
+  const retorno = collection_status ?? mpStatus;
   let p: Consulta | null = null;
   if (/^\d+$/.test(numero) && t && UUID.test(t)) {
     const { data } = await createPublicClient().rpc("consultar_pedido", { p_numero: Number(numero), p_token: t });
@@ -37,6 +38,10 @@ export default async function AcompanharPedido({ params, searchParams }: { param
         ) : (
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-6">
             <h1 className="text-2xl">Pedido #{p.numero}</h1>
+            {novo && <p className="mb-4 rounded-xl bg-[var(--sel)] p-3 text-sm"><b>Pedido recebido!</b> Guarde este link. Vamos conferir os detalhes e mandar o valor final pelo WhatsApp.</p>}
+            {retorno === "approved" && p.status === "aguardando_pagamento" && <p className="mb-4 rounded-xl bg-[var(--sel)] p-3 text-sm"><b>Pagamento aprovado!</b> Em instantes o pedido aparece como “Em produção”.</p>}
+            {(retorno === "pending" || retorno === "in_process") && <p className="mb-4 rounded-xl bg-[var(--sel)] p-3 text-sm">Pagamento em análise. Avisamos quando for confirmado.</p>}
+            {(retorno === "rejected" || erro === "pagamento") && <p className="mb-4 rounded-xl p-3 text-sm font-semibold text-white" style={{ background: "var(--coral)" }}>O pagamento não foi concluído. Tente de novo ou fale com a gente.</p>}
             <p className="text-sm text-[var(--soft)] mb-5">Feito em {new Date(p.criado_em).toLocaleDateString("pt-BR", { timeZone: "America/Bahia" })}</p>
 
             {p.status === "cancelado" ? (
@@ -66,6 +71,9 @@ export default async function AcompanharPedido({ params, searchParams }: { param
               {p.itens?.map((i, k) => <li key={k}>{i.quantidade}× {i.descricao}</li>)}
             </ul>
             {p.total != null && <p className="text-xl font-bold mb-3">Total {formatBRL(Number(p.total))}</p>}
+            {p.status === "aguardando_pagamento" && Number(p.total) > 0 && (
+              <a href={`/pedido/${p.numero}/pagar?t=${t}`} className="btn wa mb-4 inline-flex">Pagar com Pix ou cartão</a>
+            )}
             {p.prazo_entrega && <p>Previsão de entrega: <b>{new Date(p.prazo_entrega + "T12:00:00").toLocaleDateString("pt-BR")}</b></p>}
             {p.codigo_rastreio && (
               <p className="mt-1">Rastreio: <a className="underline font-semibold" href={`https://rastreamento.correios.com.br/app/index.php?objeto=${encodeURIComponent(p.codigo_rastreio)}`} target="_blank" rel="noopener">{p.codigo_rastreio}</a></p>
