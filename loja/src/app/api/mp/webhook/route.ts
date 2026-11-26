@@ -16,7 +16,14 @@ export async function POST(req: NextRequest) {
   const id = String(corpo.data?.id ?? url.searchParams.get("data.id") ?? url.searchParams.get("id") ?? "");
   if (tipo !== "payment" || !/^\d+$/.test(id)) return NextResponse.json({ ignorado: true });
 
-  const pg = await buscarPagamento(id);
+  let pg;
+  try {
+    pg = await buscarPagamento(id);
+  } catch (e) {
+    const msg = String((e as Error).message);
+    if (msg.includes(" 404")) return NextResponse.json({ ignorado: true }); // aviso de teste do MP
+    throw e; // outro erro: responde 500 e o MP tenta de novo
+  }
   if (!pg.external_reference) return NextResponse.json({ ignorado: true });
 
   const sb = createAdminClient()!;
