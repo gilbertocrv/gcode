@@ -6,11 +6,12 @@ import { salvarProduto } from "../actions";
 export default async function NovoProduto() {
   const sb = await requireAdmin();
   const { data: categorias } = await sb.from("categorias").select("slug, nome").order("ordem");
+  const { data: materiais } = await sb.from("materiais").select("id, nome").not("largura_cm", "is", null).order("nome");
   return (
     <>
       <Topo titulo="Novo produto" voltar="/admin/produtos" />
       <p className="mb-4 text-sm text-[var(--soft)]">As fotos entram depois de criar o produto.</p>
-      <FormProduto acao={salvarProduto} categorias={categorias ?? []} />
+      <FormProduto acao={salvarProduto} categorias={categorias ?? []} materiais={materiais ?? []} />
     </>
   );
 }

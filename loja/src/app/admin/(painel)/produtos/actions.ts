@@ -50,8 +50,15 @@ export async function salvarProduto(form: FormData) {
 
   const custos = {
     produto_id: produtoId,
-    custo_material: num(form, "custo_material"),
+    material_id: txt(form, "material_id"),
+    largura_cm: num(form, "largura_cm"),
+    altura_cm: num(form, "altura_cm"),
+    camadas: Math.max(1, int(form, "camadas") ?? 1),
     tempo_maquina_min: int(form, "tempo_maquina_min"),
+    tempo_mao_obra_min: int(form, "tempo_mao_obra_min"),
+    preco_mercado: num(form, "preco_mercado"),
+    preco_mercado_vendas: int(form, "preco_mercado_vendas"),
+    preco_mercado_link: txt(form, "preco_mercado_link"),
     extras: num(form, "extras"),
     descricao_extras: txt(form, "descricao_extras"),
     arquivo_corte: txt(form, "arquivo_corte"),
@@ -61,6 +68,7 @@ export async function salvarProduto(form: FormData) {
   if (e2) throw new Error(e2.message);
 
   revalidatePath("/admin/produtos");
+  revalidatePath("/admin/precificacao");
   revalidatePath("/");
   if (!id) redirect(`/admin/produtos/${produtoId}?novo=1`);
   revalidatePath(`/admin/produtos/${produtoId}`);

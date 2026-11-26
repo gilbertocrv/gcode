@@ -18,8 +18,8 @@ const Check = ({ name, label, on }: { name: string; label: string; on?: boolean 
 );
 
 export default function FormProduto({
-  acao, p = {}, custos = {}, categorias,
-}: { acao: (f: FormData) => Promise<void>; p?: P; custos?: P; categorias: { slug: string; nome: string }[] }) {
+  acao, p = {}, custos = {}, categorias, materiais = [],
+}: { acao: (f: FormData) => Promise<void>; p?: P; custos?: P; categorias: { slug: string; nome: string }[]; materiais?: { id: string; nome: string }[] }) {
   return (
     <form action={acao} className="flex flex-col gap-5">
       {p.id && <input type="hidden" name="id" value={p.id} />}
@@ -77,17 +77,33 @@ export default function FormProduto({
 
       <section className={`${cartao} grid gap-3 md:grid-cols-3`}>
         <h2 className="text-xl md:col-span-3">Custos (só você vê)</h2>
-        <label className={rotulo}>Material (R$)<input name="custo_material" inputMode="decimal" defaultValue={custos.custo_material ?? ""} className={campo} /></label>
+        <p className="md:col-span-3 text-sm text-[var(--soft)]">Usados na tela Precificação para calcular o custo e o preço mínimo.</p>
+        <label className={`${rotulo} md:col-span-3`}>
+          Chapa usada
+          <select name="material_id" defaultValue={custos.material_id ?? ""} className={campo}>
+            <option value="">—</option>
+            {materiais.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
+          </select>
+        </label>
+        <label className={rotulo}>Largura da peça (cm)<input name="largura_cm" inputMode="decimal" defaultValue={custos.largura_cm ?? ""} className={campo} /></label>
+        <label className={rotulo}>Altura da peça (cm)<input name="altura_cm" inputMode="decimal" defaultValue={custos.altura_cm ?? ""} className={campo} /></label>
+        <label className={rotulo}>Nº de peças (camadas)<input name="camadas" type="number" min={1} defaultValue={custos.camadas ?? 1} className={campo} /></label>
         <label className={rotulo}>Tempo de máquina (min)<input name="tempo_maquina_min" type="number" min={0} defaultValue={custos.tempo_maquina_min ?? ""} className={campo} /></label>
+        <label className={rotulo}>Mão de obra (min)<input name="tempo_mao_obra_min" type="number" min={0} defaultValue={custos.tempo_mao_obra_min ?? ""} className={campo} /></label>
+        <label className={rotulo}>Custo calculado (R$)<input name="custo_material" inputMode="decimal" defaultValue={custos.custo_material ?? ""} className={campo} readOnly /></label>
         <label className={rotulo}>Extras (R$)<input name="extras" inputMode="decimal" defaultValue={custos.extras ?? ""} className={campo} /></label>
         <label className={rotulo}>O que são os extras<input name="descricao_extras" defaultValue={custos.descricao_extras ?? ""} placeholder="ímã, verniz, mecanismo…" className={campo} /></label>
         <label className={`${rotulo} md:col-span-2`}>Pasta do arquivo de corte<input name="arquivo_corte" defaultValue={custos.arquivo_corte ?? ""} placeholder="D:\CNC LASER\01 MINHAS ARTES\…" className={campo} /></label>
         <label className={`${rotulo} md:col-span-3`}>Notas<textarea name="notas" rows={2} defaultValue={custos.notas ?? ""} className={`${campo} py-2`} /></label>
         {p.preco != null && custos.custo_material != null && (
           <p className="md:col-span-3 text-sm">
-            Margem aproximada: <b>{Math.round(((Number(p.preco) - Number(custos.custo_material) - Number(custos.extras ?? 0)) / Number(p.preco)) * 100)}%</b> sobre o preço de venda.
+            Sobra aproximada no Pix: <b>{Math.round(((Number(p.preco) - Number(custos.custo_material)) / Number(p.preco)) * 100)}%</b> do preço de venda.
           </p>
         )}
+        <h3 className="md:col-span-3 font-semibold mt-2">Preço de mercado (anúncio mais vendido)</h3>
+        <label className={rotulo}>Preço (R$)<input name="preco_mercado" inputMode="decimal" defaultValue={custos.preco_mercado ?? ""} className={campo} /></label>
+        <label className={rotulo}>Vendas do anúncio<input name="preco_mercado_vendas" type="number" min={0} defaultValue={custos.preco_mercado_vendas ?? ""} className={campo} /></label>
+        <label className={rotulo}>Link do anúncio<input name="preco_mercado_link" type="url" defaultValue={custos.preco_mercado_link ?? ""} className={campo} /></label>
       </section>
 
       <div><button className={btn} type="submit">{p.id ? "Salvar alterações" : "Criar produto"}</button></div>

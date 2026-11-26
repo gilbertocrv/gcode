@@ -12,6 +12,7 @@ const MENU = [
   { href: "/admin/produtos", nome: "Produtos" },
   { href: "/admin/clientes", nome: "Clientes" },
   { href: "/admin/materiais", nome: "Materiais" },
+  { href: "/admin/precificacao", nome: "Precificação" },
 ];
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
