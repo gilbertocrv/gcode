@@ -27,16 +27,29 @@ function Campos({ m = {} }: { m?: M }) {
 export default async function Materiais() {
   const sb = await requireAdmin();
   const { data: lista } = await sb.from("materiais").select("*").order("material").order("espessura_mm");
-  const valor = (lista ?? []).reduce((s, m) => s + Number(m.quantidade) * Number(m.custo_unitario ?? 0), 0);
+  const PATRIMONIO = ["Ferramenta", "Equipamento"];
+  const v = (m: M) => Number(m.quantidade) * Number(m.custo_unitario ?? 0);
+  const valor = (lista ?? []).filter((m) => !PATRIMONIO.includes(m.material)).reduce((s, m) => s + v(m), 0);
+  const valorFerr = (lista ?? []).filter((m) => PATRIMONIO.includes(m.material)).reduce((s, m) => s + v(m), 0);
+  const grupos = [...new Set((lista ?? []).map((m) => m.material as string))]
+    .sort((a, b) => Number(PATRIMONIO.includes(a)) - Number(PATRIMONIO.includes(b)) || a.localeCompare(b, "pt-BR"));
 
   return (
     <>
       <Topo titulo="Materiais" />
-      <p className="mb-4 text-sm text-[var(--soft)]">Valor parado em estoque: <b>{formatBRL(valor)}</b></p>
+      <p className="mb-4 text-sm text-[var(--soft)]">
+        Insumos em estoque: <b>{formatBRL(valor)}</b> · Ferramentas e equipamentos: <b>{formatBRL(valorFerr)}</b>
+      </p>
+      <nav className="mb-5 flex flex-wrap gap-2 text-sm">
+        {grupos.map((g) => <a key={g} href={`#g-${encodeURIComponent(g)}`} className="rounded-full border border-[var(--line)] bg-[var(--card)] px-3 py-1">{g}</a>)}
+      </nav>
 
       {!lista?.length && <Vazio>Nenhum material cadastrado.</Vazio>}
-      <ul className="flex flex-col gap-3 mb-8">
-        {lista?.map((m) => {
+      {grupos.map((g) => (
+      <section key={g} id={`g-${encodeURIComponent(g)}`} className="mb-6 scroll-mt-4">
+      <h2 className="text-xl mb-2">{g} <span className="text-sm text-[var(--soft)]">({lista!.filter((m) => m.material === g).length})</span></h2>
+      <ul className="flex flex-col gap-3">
+        {lista!.filter((m) => m.material === g).map((m) => {
           const baixo = m.minimo != null && Number(m.quantidade) < Number(m.minimo);
           return (
             <li key={m.id} className={cartao} style={baixo ? { borderColor: "var(--coral)" } : undefined}>
@@ -73,6 +86,8 @@ export default async function Materiais() {
           );
         })}
       </ul>
+      </section>
+      ))}
 
       <section className={cartao}>
         <h2 className="text-xl mb-3">Cadastrar material</h2>
