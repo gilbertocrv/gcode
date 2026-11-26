@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Crie a sua onda sonora · G-Code</title>
+<title>Eternize um som especial · G-Code</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -20,7 +20,8 @@ header{background:var(--navy);color:#fff;padding:20px max(5vw,16px) 26px}
 .back{color:#C9DCE2;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;min-height:36px}
 .back:hover{color:#fff}
 header h1{font-size:clamp(28px,4.4vw,42px);margin-top:6px}
-header p{color:#C9DCE2;max-width:60ch;margin:10px 0 0;font-size:17px}
+header p{color:#C9DCE2;max-width:62ch;margin:10px 0 0;font-size:17px}
+.ideas{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.ideas span{border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font-size:14px;color:#E3EEF1}
 main{padding:22px max(5vw,16px) 70px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:22px;align-items:start}
 @media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}.prevbox{position:static}}
@@ -65,15 +66,16 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monosp
 <body>
 <header><div class="wrap">
   <a class="back" href="index.html">← Voltar ao catálogo</a>
-  <h1>Crie a onda da sua música</h1>
-  <p>Escolha o áudio, o trecho e o texto. A prévia mostra o quadro de 30 × 14 cm do jeito que ele vai ficar. Depois é só pedir pelo WhatsApp.</p>
+  <h1>Eternize um som especial</h1>
+  <p>A música do casal, o coração do bebê no ultrassom, o latido do seu pet, um "eu te amo" guardado no celular. Escolha o áudio e veja na hora como fica o quadro de 30 × 14 cm.</p>
+  <div class="ideas"><span>🎵 Música</span><span>💓 Coração do bebê</span><span>👶 Primeiro choro</span><span>🐾 Latido e miado</span><span>💬 Voz de quem você ama</span></div>
 </div></header>
 <main><div class="wrap grid">
   <div class="box">
     <div class="step"><span class="n">1</span><div>
       <h2>Escolha o áudio</h2>
-      <label class="file" id="fileLbl"><input id="file" type="file" accept="audio/*,video/mp4,.mp3,.m4a,.wav,.ogg,.opus,.aac"><span id="fileTxt">Toque para escolher a música ou o áudio</span></label>
-      <div class="meta" style="margin-top:6px">Pode ser MP3, áudio do WhatsApp ou gravação do celular.</div>
+      <label class="file" id="fileLbl"><input id="file" type="file" accept="audio/*,video/mp4,.mp3,.m4a,.wav,.ogg,.opus,.aac"><span id="fileTxt">Toque para escolher o áudio</span></label>
+      <div class="meta" style="margin-top:6px">Pode ser música (MP3), áudio do WhatsApp, gravação do celular ou o áudio do ultrassom.</div>
       <div class="msg" id="amsg" role="status"></div>
     </div></div>
     <div class="step" id="s2"><span class="n">2</span><div>
@@ -87,7 +89,7 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,Consolas,monosp
     </div></div>
     <div class="step"><span class="n">3</span><div>
       <h2>Escreva o texto</h2>
-      <label>Linha principal<input id="t1" type="text" maxlength="28" value="Nome da Música"></label>
+      <label>Linha principal<input id="t1" type="text" maxlength="28" value="Nome da Música" placeholder="Ex.: Nossa música, Thor, Coração da Alice"></label>
       <label style="margin-top:10px">Linha de baixo<input id="t2" type="text" maxlength="40" value="ARTISTA · 25.11.2026"></label>
     </div></div>
     <div class="step"><span class="n">4</span><div>
