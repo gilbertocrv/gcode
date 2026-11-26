@@ -53,6 +53,6 @@ export function sugerido(mercado: number | null, minimoPix: number, atual: numbe
     if (atual != null && atual >= minimoPix) return { valor: atual, motivo: "sem referência: mantém o atual" as const };
     return { valor: minimoPix, motivo: "sem referência: usa o mínimo" as const };
   }
-  if (mercado < minimoPix) return { valor: minimoPix, motivo: "mercado abaixo do custo" as const };
+  if (mercado < minimoPix) return { valor: minimoPix, motivo: "mercado abaixo do seu mínimo" as const };
   return { valor: mercado, motivo: "mercado" as const };
 }

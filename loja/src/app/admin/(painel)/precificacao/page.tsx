@@ -21,7 +21,7 @@ export default async function Precificacao() {
   const sb = await requireAdmin();
   const [{ data: cfgRaw }, { data }] = await Promise.all([
     sb.from("config_precificacao").select("*").eq("id", 1).single(),
-    sb.from("produto_custos").select("produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, preco_mercado_vendas, preco_mercado_titulo, preco_mercado_link, produtos!inner(titulo, preco, preco_a_partir_de, status), materiais(nome, custo_unitario, largura_cm, altura_cm)").neq("produtos.status", "inativo"),
+    sb.from("produto_custos").select("produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, preco_mercado_vendas, preco_mercado_titulo, preco_mercado_link, produtos!inner(titulo, preco, preco_a_partir_de, status), materiais(nome, custo_unitario, largura_cm, altura_cm)").neq("produtos.status", "inativo").not("material_id", "is", null),
   ]);
   const cfg = numCfg(cfgRaw!);
   const d = derivados(cfg);
@@ -74,7 +74,7 @@ export default async function Precificacao() {
         <form action={aplicarPrecos}>
           <BotaoConfirmar className={btn} msg="Trocar o preço de TODOS os produtos da lista pelo sugerido?">Aplicar sugeridos em todos</BotaoConfirmar>
         </form>
-        <span className="text-sm text-[var(--soft)]">Os tempos e medidas de cada peça ficam na página do produto, em “Custos”.</span>
+        <span className="text-sm text-[var(--soft)]">Entram aqui os produtos com chapa e medidas preenchidas na página do produto, em “Custos”. Serviços e kits de marca ficam de fora.</span>
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--line)] bg-[var(--card)]">

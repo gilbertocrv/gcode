@@ -24,7 +24,7 @@ export async function salvarConfig(form: FormData) {
 async function carregar(sb: Awaited<ReturnType<typeof requireAdmin>>) {
   const [{ data: cfg }, { data: lista }] = await Promise.all([
     sb.from("config_precificacao").select("*").eq("id", 1).single(),
-    sb.from("produto_custos").select("produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, materiais(custo_unitario, largura_cm, altura_cm), produtos(preco, preco_a_partir_de)"),
+    sb.from("produto_custos").select("produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, materiais(custo_unitario, largura_cm, altura_cm), produtos(preco, preco_a_partir_de)").not("material_id", "is", null),
   ]);
   return { cfg: numCfg(cfg!), lista: lista ?? [] };
 }
