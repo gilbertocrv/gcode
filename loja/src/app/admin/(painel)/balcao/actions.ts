@@ -50,7 +50,10 @@ export async function registrarVenda(form: FormData) {
       preco_unitario: l.preco,
     })),
   );
-  if (e2) throw new Error(e2.message);
+  if (e2) {
+    await sb.from("pedidos").delete().eq("id", ped.id);
+    throw new Error(e2.message);
+  }
 
   const desconto = num(form, "desconto") ?? 0;
   const { error: e3 } = await sb
