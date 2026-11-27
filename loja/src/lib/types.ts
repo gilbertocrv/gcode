@@ -21,6 +21,7 @@ export interface Produto {
   preco_a_partir_de: boolean;
   status: StatusProduto;
   tipo: TipoProduto;
+  codigo?: string;
   controla_estoque: boolean;
   estoque: number;
   prazo_producao_dias: number | null;

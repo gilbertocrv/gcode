@@ -27,7 +27,7 @@ export default function Folha({ produtos }: { produtos: Prod[] }) {
   useEffect(() => {
     const falta = [...new Set(etiquetas.map((p) => p.codigo))].filter((c) => !qr[c]);
     if (!falta.length) return;
-    Promise.all(falta.map(async (c) => [c, await QRCode.toDataURL(c, { margin: 0, width: 240, errorCorrectionLevel: "M" })] as const)).then((r) =>
+    Promise.all(falta.map(async (c) => [c, await QRCode.toDataURL(`https://gcodecaravelas.com.br/p/${c}`, { margin: 0, width: 240, errorCorrectionLevel: "M" })] as const)).then((r) =>
       setQr((m) => ({ ...m, ...Object.fromEntries(r) })),
     );
   }, [etiquetas, qr]);

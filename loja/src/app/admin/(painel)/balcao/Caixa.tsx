@@ -36,7 +36,8 @@ export default function Caixa({ acao, produtos, pagamentos }: { acao: (f: FormDa
     setQ("");
   };
   const porCodigo = (c: string) => {
-    const k = c.trim().toUpperCase();
+    // a etiqueta traz o link gcodecaravelas.com.br/p/GC0001: fica só o código
+    const k = (c.trim().match(/\/p\/([^/?#]+)/)?.[1] ?? c.trim()).toUpperCase();
     return produtos.find((p) => p.codigo?.toUpperCase() === k || (!!p.ean && p.ean === k.replace(/\D/g, "")));
   };
   const lido = (c: string) => {
@@ -44,7 +45,7 @@ export default function Caixa({ acao, produtos, pagamentos }: { acao: (f: FormDa
     if (p) {
       add(p);
       setAviso({ ok: true, t: `+1 ${p.titulo}` });
-    } else setAviso({ ok: false, t: `Código ${c} não está cadastrado` });
+    } else setAviso({ ok: false, t: `Código ${c.split("/").pop()} não está cadastrado` });
   };
   const toNum = (s: string) => Number(s.replace(/\./g, "").replace(",", ".")) || 0;
   const subtotal = linhas.reduce((s, l) => s + l.quantidade * l.preco, 0);

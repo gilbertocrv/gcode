@@ -2,7 +2,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import type { Categoria, Colecao, Departamento, Produto } from "@/lib/types";
 
 export const PRODUTO_COLS =
-  "id, slug, categoria, titulo, descricao, tecnica, dimensoes, preco, preco_a_partir_de, status, tipo, controla_estoque, estoque, prazo_producao_dias, personalizacao_url, destaque, foto_real, ml_url, ordem, tags, marca, compatibilidade, created_at, produto_imagens(url, storage_path, alt, ordem)";
+  "id, slug, categoria, titulo, descricao, tecnica, dimensoes, preco, preco_a_partir_de, status, tipo, controla_estoque, estoque, prazo_producao_dias, personalizacao_url, destaque, foto_real, ml_url, ordem, tags, marca, compatibilidade, codigo, created_at, produto_imagens(url, storage_path, alt, ordem)";
 
 export const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP ?? "5573988062663";
 
