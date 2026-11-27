@@ -48,7 +48,7 @@ export default async function Pagina({ params }: Props) {
       ...dep.categorias.map((c) => ({ slug: c.slug, nome: c.nome, href: `/c/${c.slug}` })),
       ...dep.colecoes.map((c) => ({ slug: c.slug, nome: c.nome, href: `/colecao/${c.slug}` })),
     ];
-    const vazio = dep.categorias.length === 0;
+    const vazio = dep.categorias.length + dep.colecoes.length === 0;
     return (
       <main className="band" style={{ paddingTop: 16 }}>
         <div className="wrap">

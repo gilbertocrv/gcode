@@ -51,7 +51,9 @@ export default async function Home() {
             </div>
             <div className="deps-grid">
               {menu.departamentos.map((d) => {
-                const doDep = produtos.filter((p) => d.categorias.some((c) => c.slug === p.categoria));
+                const doDep = produtos.filter(
+                  (p) => d.categorias.some((c) => c.slug === p.categoria) || d.colecoes.some((c) => p.tags?.includes(c.slug)),
+                );
                 const src = capa(doDep.find((p) => p.foto_real) ?? doDep[0]);
                 const vazio = !d.link && doDep.length === 0;
                 return (

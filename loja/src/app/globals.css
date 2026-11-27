@@ -140,3 +140,4 @@ header.cab{padding:0 max(5vw,16px);position:relative;z-index:6}
 .rod-pe{border-top:1px solid rgba(255,255,255,.12);margin-top:24px;padding-top:14px;font-size:13px}
 @media(max-width:860px){.rod-in{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.rod-in{grid-template-columns:1fr}.deps-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.wa-ic{margin-left:auto}@media(min-width:861px){.wa-ic{margin-left:0}}
