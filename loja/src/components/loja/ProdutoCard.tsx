@@ -3,6 +3,7 @@
 import type { Produto } from "@/lib/types";
 import { fotoUrl, precoTexto, STATUS_LABEL } from "@/lib/format";
 import { useCarrinho } from "./Carrinho";
+import Compartilhar from "@/components/Compartilhar";
 
 export default function ProdutoCard({ p }: { p: Produto }) {
   const { pedido, muda } = useCarrinho();
@@ -57,6 +58,14 @@ export default function ProdutoCard({ p }: { p: Produto }) {
           <a className="ml" href={p.ml_url} target="_blank" rel="noopener">
             Também no Mercado Livre ↗
           </a>
+        )}
+        {p.codigo && (
+          <Compartilhar
+            url={`https://gcodecaravelas.com.br/p/${p.codigo}`}
+            titulo={p.titulo}
+            texto={`${p.titulo} · ${precoTexto(p)} na G-Code`}
+            imagem={img}
+          />
         )}
       </div>
     </article>

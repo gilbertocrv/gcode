@@ -6,6 +6,9 @@ import BotaoConfirmar from "@/components/admin/BotaoConfirmar";
 import FormProduto from "@/components/admin/FormProduto";
 import FotosProduto from "@/components/admin/FotosProduto";
 import { excluirProduto, salvarProduto } from "../actions";
+import Compartilhar from "@/components/Compartilhar";
+import { fotoUrl, formatBRL } from "@/lib/format";
+import { btn2 } from "@/components/admin/ui";
 
 export default async function EditarProduto({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ novo?: string }> }) {
   const { id } = await params;
@@ -28,6 +31,28 @@ export default async function EditarProduto({ params, searchParams }: { params: 
         <Link href="/" target="_blank" className="text-sm underline">Ver na loja ↗</Link>
       </Topo>
       {novo && <p className="mb-4 rounded-xl bg-[var(--sel)] p-3 text-sm">Produto criado. Agora adicione as fotos.</p>}
+
+      <section className={`${cartao} mb-5 flex flex-wrap items-center gap-3`}>
+        <div className="flex-1 min-w-[220px]">
+          <h2 className="text-lg">Divulgar</h2>
+          <p className="text-sm text-[var(--soft)]">No celular, abre o Instagram (story ou feed) com a foto; a legenda com preço e link fica copiada para colar.</p>
+        </div>
+        <Compartilhar
+          className={btn2}
+          rotulo="Compartilhar no Instagram"
+          url={`https://gcodecaravelas.com.br/p/${p.codigo}`}
+          titulo={p.titulo}
+          imagem={fotoUrl((fotos ?? [])[0] as never)}
+          texto={[
+            `✨ ${p.titulo}`,
+            p.preco != null ? `💰 ${p.preco_a_partir_de ? "a partir de " : ""}${formatBRL(Number(p.preco))}` : null,
+            p.compatibilidade ? `📌 ${p.compatibilidade}` : null,
+            "🛒 Compre no site (link na bio) ou chame no WhatsApp (73) 98806-2663",
+            "📍 Caravelas - BA · enviamos para todo o Brasil",
+            "#gcodecaravelas #caravelas",
+          ].filter(Boolean).join("\n")}
+        />
+      </section>
 
       <section className={`${cartao} mb-5`}>
         <h2 className="text-xl mb-3">Fotos</h2>
