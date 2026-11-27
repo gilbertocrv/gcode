@@ -48,7 +48,6 @@ export async function registrarVenda(form: FormData) {
       descricao: l.descricao,
       quantidade: l.quantidade,
       preco_unitario: l.preco,
-      subtotal: Math.round(l.quantidade * l.preco * 100) / 100,
     })),
   );
   if (e2) throw new Error(e2.message);
