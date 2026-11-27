@@ -11,6 +11,7 @@ const MENU = [
   { href: "/admin/pedidos", nome: "Pedidos" },
   { href: "/admin/balcao", nome: "Balcão" },
   { href: "/admin/produtos", nome: "Produtos" },
+  { href: "/admin/etiquetas", nome: "Etiquetas" },
   { href: "/admin/clientes", nome: "Clientes" },
   { href: "/admin/materiais", nome: "Materiais" },
   { href: "/admin/precificacao", nome: "Precificação" },

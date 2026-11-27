@@ -17,7 +17,7 @@ export default async function Balcao({ searchParams }: { searchParams: Promise<{
   const [{ data: prods }, { data: vendas }] = await Promise.all([
     sb
       .from("produtos")
-      .select("id, titulo, preco, controla_estoque, estoque, marca, compatibilidade, categoria")
+      .select("id, titulo, preco, controla_estoque, estoque, marca, compatibilidade, categoria, codigo, ean")
       .neq("status", "inativo")
       .not("preco", "is", null)
       .order("titulo"),

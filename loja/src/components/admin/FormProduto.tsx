@@ -44,6 +44,7 @@ export default function FormProduto({
         <label className={rotulo}>Técnica / material<input name="tecnica" defaultValue={p.tecnica ?? ""} placeholder="MDF 3 mm, corte e gravação a laser" className={campo} /></label>
         <label className={rotulo}>Medidas<input name="dimensoes" defaultValue={p.dimensoes ?? ""} placeholder="30 × 14 cm" className={campo} /></label>
         <label className={rotulo}>Marca (acessórios)<input name="marca" defaultValue={(p.marca as string) ?? ""} placeholder="Kaidi, Elgin…" className={campo} /></label>
+        <label className={rotulo}>Código de barras de fábrica (EAN, opcional)<input name="ean" inputMode="numeric" defaultValue={(p.ean as string) ?? ""} placeholder="7891234567890 — o número embaixo das barras" className={campo} />{p.codigo ? <small className="text-[var(--soft)]">Código da etiqueta: <b>{p.codigo as string}</b></small> : null}</label>
         <label className={rotulo}>Compatibilidade<input name="compatibilidade" defaultValue={(p.compatibilidade as string) ?? ""} placeholder="USB-C · Android e iPhone 15+" className={campo} /></label>
         <label className={`${rotulo} md:col-span-2`}>Coleções (separe por vírgula)<input name="tags" defaultValue={Array.isArray(p.tags) ? (p.tags as string[]).join(", ") : ""} placeholder="natal, abrolhos, para-ele, para-ela, casa-nova" className={campo} /></label>
         <label className={rotulo}>Preço (R$) — vazio = sob consulta<input name="preco" inputMode="decimal" defaultValue={p.preco ?? ""} className={campo} /></label>

@@ -41,6 +41,7 @@ export async function salvarProduto(form: FormData) {
     caixa_larg_cm: num(form, "caixa_larg_cm"),
     caixa_alt_cm: num(form, "caixa_alt_cm"),
     marca: txt(form, "marca"),
+    ean: (txt(form, "ean") ?? "").replace(/\D/g, "") || null,
     compatibilidade: txt(form, "compatibilidade"),
     tags: (txt(form, "tags") ?? "").split(",").map((t) => slugify(t)).filter(Boolean),
   };

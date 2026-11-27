@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { formatBRL } from "@/lib/format";
 import { btn, btn2, campo, cartao, rotulo } from "@/components/admin/ui";
+import LeitorCodigo from "@/components/admin/LeitorCodigo";
 
-type Prod = { id: string; titulo: string; preco: number; controla_estoque: boolean; estoque: number; marca: string | null; compatibilidade: string | null };
+type Prod = { id: string; titulo: string; preco: number; controla_estoque: boolean; estoque: number; marca: string | null; compatibilidade: string | null; codigo?: string | null; ean?: string | null };
 type Linha = { produto_id: string | null; descricao: string; quantidade: number; preco: number };
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -17,11 +18,13 @@ export default function Caixa({ acao, produtos, pagamentos }: { acao: (f: FormDa
   const [recebido, setRecebido] = useState("");
   const [avulso, setAvulso] = useState({ d: "", p: "" });
   const [enviando, setEnviando] = useState(false);
+  const [camera, setCamera] = useState(false);
+  const [aviso, setAviso] = useState<{ ok: boolean; t: string } | null>(null);
 
   const achados = useMemo(() => {
     const t = norm(q).split(/\s+/).filter(Boolean);
     if (!t.length) return [];
-    return produtos.filter((p) => t.every((x) => norm(`${p.titulo} ${p.marca ?? ""} ${p.compatibilidade ?? ""}`).includes(x))).slice(0, 8);
+    return produtos.filter((p) => t.every((x) => norm(`${p.titulo} ${p.marca ?? ""} ${p.compatibilidade ?? ""} ${p.codigo ?? ""} ${p.ean ?? ""}`).includes(x))).slice(0, 8);
   }, [q, produtos]);
 
   const add = (p: Prod) => {
@@ -31,6 +34,17 @@ export default function Caixa({ acao, produtos, pagamentos }: { acao: (f: FormDa
       return [...ls, { produto_id: p.id, descricao: p.titulo, quantidade: 1, preco: p.preco }];
     });
     setQ("");
+  };
+  const porCodigo = (c: string) => {
+    const k = c.trim().toUpperCase();
+    return produtos.find((p) => p.codigo?.toUpperCase() === k || (!!p.ean && p.ean === k.replace(/\D/g, "")));
+  };
+  const lido = (c: string) => {
+    const p = porCodigo(c);
+    if (p) {
+      add(p);
+      setAviso({ ok: true, t: `+1 ${p.titulo}` });
+    } else setAviso({ ok: false, t: `Código ${c} não está cadastrado` });
   };
   const toNum = (s: string) => Number(s.replace(/\./g, "").replace(",", ".")) || 0;
   const subtotal = linhas.reduce((s, l) => s + l.quantidade * l.preco, 0);
@@ -54,8 +68,33 @@ export default function Caixa({ acao, produtos, pagamentos }: { acao: (f: FormDa
       <div className={cartao}>
         <label className={rotulo}>
           Buscar produto (nome, marca ou tipo: “tipo c”, “pilha aa”…)
-          <input value={q} onChange={(e) => setQ(e.target.value)} className={campo} autoFocus placeholder="Digite para buscar" />
+          <span className="flex gap-2">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => {
+                // leitor de código USB/bluetooth digita o código e aperta Enter
+                if (e.key === "Enter" && q.trim()) {
+                  e.preventDefault();
+                  if (porCodigo(q)) lido(q);
+                  else if (achados.length === 1) add(achados[0]);
+                }
+              }}
+              className={`${campo} flex-1`}
+              autoFocus
+              placeholder="Digite para buscar"
+            />
+            <button type="button" className={btn2} onClick={() => setCamera((v) => !v)}>
+              {camera ? "Fechar" : "📷 Ler código"}
+            </button>
+          </span>
         </label>
+        {camera && (
+          <div className="mt-3">
+            <LeitorCodigo onCodigo={lido} onFechar={() => setCamera(false)} />
+          </div>
+        )}
+        {aviso && <p className={`mt-2 text-sm font-semibold ${aviso.ok ? "text-[#1E7A46]" : "text-[var(--coral)]"}`}>{aviso.t}</p>}
         {achados.length > 0 && (
           <ul className="mt-2 flex flex-col divide-y divide-[var(--line)]">
             {achados.map((p) => (
