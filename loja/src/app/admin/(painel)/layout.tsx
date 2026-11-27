@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 const MENU = [
   { href: "/admin", nome: "Resumo" },
   { href: "/admin/pedidos", nome: "Pedidos" },
+  { href: "/admin/balcao", nome: "Balcão" },
   { href: "/admin/produtos", nome: "Produtos" },
   { href: "/admin/clientes", nome: "Clientes" },
   { href: "/admin/materiais", nome: "Materiais" },
