@@ -31,8 +31,8 @@ export default function ProdutoCard({ p }: { p: Produto }) {
         {p.descricao && <p>{p.descricao}</p>}
         {p.tecnica && <p style={{ fontSize: 13 }}>{p.tecnica}</p>}
         {p.personalizacao_url && (
-          <a className="mk" href={p.personalizacao_url}>
-            Crie o seu agora →
+          <a className="mk" href={p.personalizacao_url} target={p.personalizacao_url.includes("wa.me") ? "_blank" : undefined} rel="noopener">
+            {p.personalizacao_url.includes("wa.me") ? "Personalizar com nome e data no WhatsApp →" : "Crie o seu agora →"}
           </a>
         )}
         <div className="foot">

@@ -39,7 +39,7 @@ export default function Rodape({ menu, whatsapp }: { menu: Menu; whatsapp: strin
           <ul>
             <li><a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener">WhatsApp (73) 98806-2663</a></li>
             <li><a href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener">Instagram @gcodecaravelas</a></li>
-            <li><a href="mailto:gcodecaravelas@gmail.com">gcodecaravelas@gmail.com</a></li>
+            <li><a href="mailto:contato@gcodecaravelas.com.br">contato@gcodecaravelas.com.br</a></li>
             <li>Caravelas – BA</li>
           </ul>
           <p style={{ marginTop: 10 }}>Pagamento por Pix ou cartão (Mercado Pago). Envio pelos Correios e transportadoras (Melhor Envio).</p>

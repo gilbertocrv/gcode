@@ -33,7 +33,7 @@ export default function Politicas() {
 
         <Secao id="quem" titulo="Quem somos">
           <p>A G-Code é uma loja de Caravelas (BA) que faz peças em corte e gravação a laser, além de gráfica rápida e assistência técnica. Muitas peças são feitas sob encomenda, com o nome, a frase ou o som que você escolher.</p>
-          <p>Responsável: Gilberto Gonçalves dos Santos Filho · Caravelas – BA · WhatsApp (73) 98806-2663 · gcodecaravelas@gmail.com</p>
+          <p>Responsável: Gilberto Gonçalves dos Santos Filho · Caravelas – BA · WhatsApp (73) 98806-2663 · contato@gcodecaravelas.com.br</p>
         </Secao>
 
         <Secao id="pedidos" titulo="Pedidos e personalização">
@@ -70,7 +70,7 @@ export default function Politicas() {
         </Secao>
 
         <Secao id="contato" titulo="Contato">
-          <p>WhatsApp: <a className="underline" href={`https://wa.me/${WA}`}>(73) 98806-2663</a> · E-mail: <a className="underline" href="mailto:gcodecaravelas@gmail.com">gcodecaravelas@gmail.com</a> · Instagram: <a className="underline" href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener">@gcodecaravelas</a></p>
+          <p>WhatsApp: <a className="underline" href={`https://wa.me/${WA}`}>(73) 98806-2663</a> · E-mail: <a className="underline" href="mailto:contato@gcodecaravelas.com.br">contato@gcodecaravelas.com.br</a> · Instagram: <a className="underline" href="https://www.instagram.com/gcodecaravelas" target="_blank" rel="noopener">@gcodecaravelas</a></p>
         </Secao>
       </article>
     </main>
