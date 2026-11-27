@@ -1,7 +1,11 @@
 export type StatusProduto = "disponivel" | "sob_encomenda" | "vendido" | "inativo";
 export type TipoProduto = "peca_unica" | "tiragem" | "sob_medida" | "servico" | "kit";
 
-export interface Categoria { slug: string; nome: string; ordem: number }
+export interface Categoria { slug: string; nome: string; ordem: number; departamento?: string | null }
+
+export interface Departamento { slug: string; nome: string; descricao: string | null; ordem: number; link: string | null }
+
+export interface Colecao { slug: string; nome: string; descricao: string | null; departamento: string | null; destaque: boolean; ordem: number }
 
 export interface ProdutoImagem { url: string | null; storage_path: string | null; alt: string | null; ordem: number }
 
@@ -25,6 +29,10 @@ export interface Produto {
   foto_real: boolean;
   ml_url: string | null;
   ordem: number;
+  tags?: string[];
+  marca?: string | null;
+  compatibilidade?: string | null;
+  created_at?: string;
   produto_imagens: ProdutoImagem[];
 }
 

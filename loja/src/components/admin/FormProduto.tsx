@@ -43,6 +43,9 @@ export default function FormProduto({
         <label className={`${rotulo} md:col-span-2`}>Descrição<textarea name="descricao" rows={4} defaultValue={p.descricao ?? ""} className={`${campo} py-2`} /></label>
         <label className={rotulo}>Técnica / material<input name="tecnica" defaultValue={p.tecnica ?? ""} placeholder="MDF 3 mm, corte e gravação a laser" className={campo} /></label>
         <label className={rotulo}>Medidas<input name="dimensoes" defaultValue={p.dimensoes ?? ""} placeholder="30 × 14 cm" className={campo} /></label>
+        <label className={rotulo}>Marca (acessórios)<input name="marca" defaultValue={(p.marca as string) ?? ""} placeholder="Kaidi, Elgin…" className={campo} /></label>
+        <label className={rotulo}>Compatibilidade<input name="compatibilidade" defaultValue={(p.compatibilidade as string) ?? ""} placeholder="USB-C · Android e iPhone 15+" className={campo} /></label>
+        <label className={`${rotulo} md:col-span-2`}>Coleções (separe por vírgula)<input name="tags" defaultValue={Array.isArray(p.tags) ? (p.tags as string[]).join(", ") : ""} placeholder="natal, abrolhos, para-ele, para-ela, casa-nova" className={campo} /></label>
         <label className={rotulo}>Preço (R$) — vazio = sob consulta<input name="preco" inputMode="decimal" defaultValue={p.preco ?? ""} className={campo} /></label>
         <label className={rotulo}>Prazo de produção (dias)<input name="prazo_producao_dias" type="number" min={0} defaultValue={p.prazo_producao_dias ?? ""} className={campo} /></label>
         <div className="md:col-span-2 flex flex-wrap gap-x-6 gap-y-2">

@@ -40,6 +40,9 @@ export async function salvarProduto(form: FormData) {
     caixa_comp_cm: num(form, "caixa_comp_cm"),
     caixa_larg_cm: num(form, "caixa_larg_cm"),
     caixa_alt_cm: num(form, "caixa_alt_cm"),
+    marca: txt(form, "marca"),
+    compatibilidade: txt(form, "compatibilidade"),
+    tags: (txt(form, "tags") ?? "").split(",").map((t) => slugify(t)).filter(Boolean),
   };
 
   const caixaId = txt(form, "caixa_id");
@@ -80,7 +83,7 @@ export async function salvarProduto(form: FormData) {
 
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/precificacao");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   if (!id) redirect(`/admin/produtos/${produtoId}?novo=1`);
   revalidatePath(`/admin/produtos/${produtoId}`);
 }
@@ -94,7 +97,7 @@ export async function excluirProduto(form: FormData) {
   if (error) throw new Error(error.message);
   if (paths.length) await sb.storage.from("produtos").remove(paths);
   revalidatePath("/admin/produtos");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   redirect("/admin/produtos");
 }
 
@@ -103,5 +106,5 @@ export async function atualizarVitrine(produtoId: string) {
   await requireAdmin();
   revalidatePath(`/admin/produtos/${produtoId}`);
   revalidatePath("/admin/produtos");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
 }
