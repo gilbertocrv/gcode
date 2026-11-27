@@ -68,14 +68,21 @@ export default function FormProduto({
         <label className={rotulo}>Avisar quando chegar a<input name="estoque_minimo" type="number" min={0} defaultValue={p.estoque_minimo ?? 0} className={campo} /></label>
         <div className="md:col-span-3"><Check name="controla_estoque" label="Controlar estoque (baixa sozinho quando o pedido é concluído)" on={p.controla_estoque} /></div>
         <h3 className="md:col-span-3 font-semibold mt-2">Embalagem para o frete</h3>
-        <label className={`${rotulo} md:col-span-3`}>
-          Caixa padrão (sai do estoque quando o pedido é marcado como enviado)
+        <label className={rotulo}>
+          Tipo de embalagem
+          <select name="embalagem" defaultValue={p.embalagem ?? "caixa"} className={campo}>
+            <option value="caixa">Caixa</option>
+            <option value="embrulho">Embrulho em papelão (peças planas e grandes)</option>
+          </select>
+        </label>
+        <label className={`${rotulo} md:col-span-2`}>
+          Caixa padrão (só para “Caixa”; sai do estoque quando o pedido é marcado como enviado)
           <select name="caixa_id" defaultValue={p.caixa_id ?? ""} className={campo}>
             <option value="">Sem caixa padrão (embalagem sob medida)</option>
             {caixas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
           </select>
         </label>
-        <p className="md:col-span-3 text-xs text-[var(--soft)]">Com caixa padrão, as medidas abaixo são preenchidas pela caixa ao salvar. Ajuste só o peso.</p>
+        <p className="md:col-span-3 text-xs text-[var(--soft)]">Com caixa padrão, as medidas abaixo são preenchidas pela caixa ao salvar. No embrulho, preencha as medidas do pacote pronto (peça + 2 cm de cada lado): o frete e o papelão gasto saem delas.</p>
         <label className={rotulo}>Peso embalado (g)<input name="peso_g" type="number" min={1} defaultValue={p.peso_g ?? ""} className={campo} /></label>
         <label className={rotulo}>Caixa: comprimento (cm)<input name="caixa_comp_cm" inputMode="decimal" defaultValue={p.caixa_comp_cm ?? ""} className={campo} /></label>
         <label className={rotulo}>Caixa: largura (cm)<input name="caixa_larg_cm" inputMode="decimal" defaultValue={p.caixa_larg_cm ?? ""} className={campo} /></label>

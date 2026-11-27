@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { formatBRL } from "@/lib/format";
-import { custoPeca, derivados, numCfg, precos, sugerido } from "@/lib/precificacao";
+import { CFG_SELECT, PROD_EMB, custoPeca, derivados, embalagemCusto, numCfg, papelaoDoCfg, precos, sugerido } from "@/lib/precificacao";
 import { Topo, btn, btn2, campo, cartao, rotulo } from "@/components/admin/ui";
 import BotaoConfirmar from "@/components/admin/BotaoConfirmar";
 import { aplicarPrecos, salvarConfig } from "./actions";
 
-const caixaCusto = (pr: unknown) => { const p = (Array.isArray(pr) ? pr[0] : pr) as { caixa?: { custo_unitario: number | null } | { custo_unitario: number | null }[] | null } | null; const c = Array.isArray(p?.caixa) ? p?.caixa[0] : p?.caixa; return c?.custo_unitario != null ? Number(c.custo_unitario) : null; };
+
 
 type Linha = {
   produto_id: string; largura_cm: number | null; altura_cm: number | null; camadas: number | null; extras: number | null;
@@ -22,9 +22,10 @@ const vendas = (v: number | null) => (v == null ? "" : v >= 1000 ? `+${v / 1000}
 export default async function Precificacao() {
   const sb = await requireAdmin();
   const [{ data: cfgRaw }, { data }] = await Promise.all([
-    sb.from("config_precificacao").select("*").eq("id", 1).single(),
-    sb.from("produto_custos").select("produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, preco_mercado_vendas, preco_mercado_titulo, preco_mercado_link, produtos!inner(titulo, preco, preco_a_partir_de, status, caixa:materiais(custo_unitario)), materiais(nome, custo_unitario, largura_cm, altura_cm)").neq("produtos.status", "inativo").not("material_id", "is", null),
+    sb.from("config_precificacao").select(CFG_SELECT).eq("id", 1).single(),
+    sb.from("produto_custos").select(`produto_id, largura_cm, altura_cm, camadas, extras, tempo_maquina_min, tempo_mao_obra_min, preco_mercado, preco_mercado_vendas, preco_mercado_titulo, preco_mercado_link, produtos!inner(titulo, preco, preco_a_partir_de, status, ${PROD_EMB}), materiais(nome, custo_unitario, largura_cm, altura_cm)`).neq("produtos.status", "inativo").not("material_id", "is", null),
   ]);
+  const papelaoM2 = papelaoDoCfg(cfgRaw);
   const cfg = numCfg(cfgRaw!);
   const d = derivados(cfg);
   const linhas = ((data ?? []) as unknown as Linha[]).map((r) => {
@@ -34,7 +35,7 @@ export default async function Precificacao() {
       material_custo: m?.custo_unitario ?? null, material_largura: m?.largura_cm ?? null, material_altura: m?.altura_cm ?? null,
       largura_cm: r.largura_cm, altura_cm: r.altura_cm, camadas: r.camadas, extras: r.extras,
       tempo_maquina_min: r.tempo_maquina_min, tempo_mao_obra_min: r.tempo_mao_obra_min,
-      caixa_custo: caixaCusto(r.produtos),
+      caixa_custo: embalagemCusto(r.produtos, papelaoM2),
     });
     const pr = precos(cfg, custo);
     const s = sugerido(r.preco_mercado != null ? Number(r.preco_mercado) : null, pr.pix, p?.preco != null && !p.preco_a_partir_de ? Number(p.preco) : null);

@@ -170,10 +170,11 @@ export default async function Pedido({ params }: { params: Promise<{ id: string 
               <ol className="list-decimal pl-5 text-sm flex flex-col gap-1">
                 <li>Confira a peça e a personalização com o pedido.</li>
                 <li>Embrulhe no plástico bolha (acrílico e peças vazadas com 2 voltas).</li>
-                <li>Coloque na caixa com o cartão de agradecimento; preencha os vazios para não balançar.</li>
+                <li>Peças planas e grandes: embrulhe em duas camadas de papelão ondulado, com as ondas cruzadas, formando um pacote retangular firme (nada de pontas soltas). Peças pequenas: na caixa P, com os vazios preenchidos.</li>
+                <li>Junte o cartão de agradecimento.</li>
                 <li>Feche com fita marrom e lacre com o adesivo da logo.</li>
                 <li>{p.entrega === "envio" ? "Gere e imprima a etiqueta abaixo e cole no lado maior." : "Combine a entrega com o cliente."}</li>
-                <li>Poste{p.frete_servico ? ` (${p.frete_servico})` : ""} e marque o pedido como “Enviado” — a caixa sai do estoque.</li>
+                <li>Poste{p.frete_servico ? ` (${p.frete_servico})` : ""} e marque o pedido como “Enviado” — a caixa e o papelão saem do estoque.</li>
                 <li>Busque o rastreio e mande pelo botão do WhatsApp.</li>
               </ol>
             </section>

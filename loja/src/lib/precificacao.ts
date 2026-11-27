@@ -12,6 +12,27 @@ export type CustoProduto = {
   caixa_custo?: number | null;
 };
 
+/** m² de papelão para embrulhar um pacote c × l × a cm (2 camadas + 10% de sobra) — igual à função embrulho_m2 do banco. */
+export const embrulhoM2 = (c?: number | null, l?: number | null, a?: number | null) => {
+  const [x, y, z] = [Number(c ?? 0), Number(l ?? 0), Number(a ?? 0)];
+  return Math.round((2 * (x * y + x * z + y * z)) / 10000 * 2.2 * 1000) / 1000;
+};
+
+type ProdEmb = { embalagem?: string; caixa_comp_cm?: number | null; caixa_larg_cm?: number | null; caixa_alt_cm?: number | null; caixa?: { custo_unitario: number | null } | { custo_unitario: number | null }[] | null };
+/** Custo da embalagem de um produto: caixa padrão ou papelão do embrulho. */
+export const embalagemCusto = (pr: unknown, papelaoM2: number) => {
+  const p = (Array.isArray(pr) ? pr[0] : pr) as ProdEmb | null;
+  if (p?.embalagem === "embrulho") return embrulhoM2(p.caixa_comp_cm, p.caixa_larg_cm, p.caixa_alt_cm) * papelaoM2;
+  const c = Array.isArray(p?.caixa) ? p?.caixa[0] : p?.caixa;
+  return c?.custo_unitario != null ? Number(c.custo_unitario) : null;
+};
+export const CFG_SELECT = "*, papelao:materiais!config_precificacao_papelao_id_fkey(custo_unitario)";
+export const PROD_EMB = "embalagem, caixa_comp_cm, caixa_larg_cm, caixa_alt_cm, caixa:materiais(custo_unitario)";
+export const papelaoDoCfg = (cfgRaw: unknown) => {
+  const papel = (cfgRaw as { papelao?: { custo_unitario: number } | { custo_unitario: number }[] | null } | null)?.papelao;
+  return Number((Array.isArray(papel) ? papel[0] : papel)?.custo_unitario ?? 2.72);
+};
+
 export const numCfg = (c: Record<string, unknown>) =>
   Object.fromEntries(Object.entries(c).map(([k, v]) => [k, typeof v === "string" && v !== "" && !isNaN(+v) ? +v : v])) as unknown as Config;
 

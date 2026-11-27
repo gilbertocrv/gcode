@@ -45,7 +45,9 @@ export async function salvarProduto(form: FormData) {
     tags: (txt(form, "tags") ?? "").split(",").map((t) => slugify(t)).filter(Boolean),
   };
 
-  const caixaId = txt(form, "caixa_id");
+  const embalagem = txt(form, "embalagem") === "embrulho" ? "embrulho" : "caixa";
+  Object.assign(dados, { embalagem });
+  const caixaId = embalagem === "caixa" ? txt(form, "caixa_id") : null;
   Object.assign(dados, { caixa_id: caixaId });
   if (caixaId) {
     const { data: cx } = await sb.from("materiais").select("largura_cm, altura_cm, profundidade_cm").eq("id", caixaId).single();
