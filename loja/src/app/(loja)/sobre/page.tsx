@@ -19,7 +19,7 @@ export default function Sobre() {
     <main className="band sobre" style={{ paddingTop: 16 }}>
       <div className="wrap">
         <header className="sob-hero">
-          <img src="/logo.svg" alt="G-Code" width={338} height={100} />
+          <span className="sob-logo"><img src="/logo.svg" alt="G-Code" /></span>
           <h1 className="tit">O código que vira peça.</h1>
           <p className="lead">
             A G-Code é uma loja de Caravelas, no extremo sul da Bahia, que transforma ideias em objetos: corte e gravação a laser,
