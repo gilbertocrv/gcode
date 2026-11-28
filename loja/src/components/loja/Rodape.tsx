@@ -31,7 +31,7 @@ export default function Rodape({ menu, whatsapp }: { menu: Menu; whatsapp: strin
             <li><Link href="/politicas#entrega">Entrega e frete</Link></li>
             <li><Link href="/politicas#trocas">Trocas e devoluções</Link></li>
             <li><Link href="/politicas#privacidade">Privacidade</Link></li>
-            <li><Link href="/politicas#quem">Quem somos</Link></li>
+            <li><Link href="/sobre">Sobre a G-Code</Link></li>
           </ul>
         </div>
         <div>
