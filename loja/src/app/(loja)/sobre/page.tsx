@@ -18,14 +18,14 @@ export default function Sobre() {
   return (
     <main className="band sobre" style={{ paddingTop: 16 }}>
       <div className="wrap">
-        <header className="sob-hero">
+        <div className="sob-hero">
           <span className="sob-logo"><img src="/logo.svg" alt="G-Code" /></span>
           <h1 className="tit">O código que vira peça.</h1>
           <p className="lead">
             A G-Code é uma loja de Caravelas, no extremo sul da Bahia, que transforma ideias em objetos: corte e gravação a laser,
             impressão 3D, gráfica rápida e assistência técnica. O nome, o símbolo e as cores contam essa história.
           </p>
-        </header>
+        </div>
 
         <section className="sob-bloco" aria-labelledby="nome">
           <div>
