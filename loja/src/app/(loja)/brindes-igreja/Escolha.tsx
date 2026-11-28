@@ -47,7 +47,7 @@ export default function Escolha({ brindes, dias, ocupados }: { brindes: Brinde[]
           {brindes.map((x) => (
             <label key={x.id} className={`atac-c brd-c ${bid === x.id ? "sel" : ""}`}>
               <input type="radio" name="brinde-vis" className="sr-only" checked={bid === x.id} onChange={() => setBid(x.id)} />
-              <span className="brd-ic" aria-hidden="true">{x.icone}</span>
+              {x.foto ? <img src={x.foto} alt={x.nome} className="brd-foto" loading="lazy" /> : <span className="brd-ic" aria-hidden="true">{x.icone}</span>}
               <b>{x.nome}</b>
               <small>{x.descricao}</small>
               <small className="brd-ct">{x.contato}</small>
