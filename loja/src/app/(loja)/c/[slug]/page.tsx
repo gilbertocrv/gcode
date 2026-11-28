@@ -1,3 +1,4 @@
+import TabelaAtacado from "@/components/loja/TabelaAtacado";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMenu, getProdutos } from "@/lib/catalogo";
@@ -94,6 +95,7 @@ export default async function Pagina({ params }: Props) {
         <div style={{ marginTop: 18 }}>
           <Grade produtos={lista} />
         </div>
+        {cat.slug === "chav" && <TabelaAtacado />}
         <Ajuda />
       </div>
     </main>

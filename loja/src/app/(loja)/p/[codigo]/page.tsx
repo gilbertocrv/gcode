@@ -4,6 +4,7 @@ import { getMenu, getProdutos, WHATSAPP } from "@/lib/catalogo";
 import { precoTexto } from "@/lib/format";
 import { Ajuda, Prateleira, Trilha } from "@/components/loja/Blocos";
 import ProdutoCard from "@/components/loja/ProdutoCard";
+import TabelaAtacado from "@/components/loja/TabelaAtacado";
 
 export const revalidate = 60;
 export async function generateStaticParams() {
@@ -51,6 +52,7 @@ export default async function ProdutoPorCodigo({ params }: Props) {
           </a>
           <p style={{ fontSize: 13, color: "var(--soft)", textAlign: "center", marginTop: 8 }}>Código {p.codigo}</p>
         </div>
+        {/chaveiro/i.test(p.titulo) && p.categoria !== "util" && <TabelaAtacado titulo="Preço por quantidade" />}
         {parecidos.length > 0 && <Prateleira titulo="Veja também" href={cat ? `/c/${cat.slug}` : undefined} produtos={parecidos} />}
         <Ajuda />
       </div>

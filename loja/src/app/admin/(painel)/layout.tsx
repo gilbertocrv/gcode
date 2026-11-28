@@ -12,6 +12,7 @@ const MENU = [
   { href: "/admin/balcao", nome: "Balcão" },
   { href: "/admin/produtos", nome: "Produtos" },
   { href: "/admin/etiquetas", nome: "Etiquetas" },
+  { href: "/admin/chaveiros", nome: "Chaveiros" },
   { href: "/admin/clientes", nome: "Clientes" },
   { href: "/admin/materiais", nome: "Materiais" },
   { href: "/admin/precificacao", nome: "Precificação" },
